@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  role          Role      @default(USER)
+  password      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  bookings      Booking[]
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  price       Float
+  duration    Int      // Duration in minutes
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  bookings    Booking[]
+}
+
+model Booking {
+  id              String        @id @default(cuid())
+  userId          String?       // Optional if we allow guest bookings
+  user            User?         @relation(fields: [userId], references: [id])
+  guestName       String?
+  guestEmail      String?
+  guestPhone      String?
+  
+  serviceId       String
+  service         Service       @relation(fields: [serviceId], references: [id])
+  
+  appointmentDate DateTime
+  status          BookingStatus @default(PENDING)
+  notes           String?
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Post {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String
+  excerpt     String?
+  coverImage  String?
+  seoTitle    String?  
+  seoDesc     String?
+  published   Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
