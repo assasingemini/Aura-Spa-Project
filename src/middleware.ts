@@ -1,28 +1,31 @@
-import NextAuth from "next-auth";
-import authConfig from "@/lib/auth.config";
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-const { auth } = NextAuth(authConfig);
+/**
+ * Lightweight middleware — only checks for NextAuth session cookie.
+ * Full role/permission checks happen in server components/API routes.
+ * This avoids bundling NextAuth/Prisma/bcryptjs into the Edge Function.
+ */
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
 
-export default auth((req) => {
-  const { pathname } = req.nextUrl;
+  // Check for NextAuth session cookie
+  const sessionToken =
+    request.cookies.get("__Secure-authjs.session-token") ??
+    request.cookies.get("authjs.session-token") ??
+    request.cookies.get("next-auth.session-token") ??
+    request.cookies.get("__Secure-next-auth.session-token");
 
-  // Protect /admin routes
   if (pathname.startsWith("/admin")) {
-    if (!req.auth) {
-      const loginUrl = new URL("/login", req.url);
+    if (!sessionToken) {
+      const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
       return NextResponse.redirect(loginUrl);
-    }
-
-    // Check admin role
-    if ((req.auth.user as any)?.role !== "ADMIN") {
-      return NextResponse.redirect(new URL("/", req.url));
     }
   }
 
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: ["/admin/:path*"],
