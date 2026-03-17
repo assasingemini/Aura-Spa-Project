@@ -1,8 +1,19 @@
+"use client";
+
 import { RouterProvider } from "react-router";
-import { router } from "./routes";
+import { getRouter } from "./routes";
 import { Toaster } from "sonner";
+import { useEffect, useState } from "react";
 
 export default function App() {
+  const [router, setRouter] = useState<any>(null);
+
+  useEffect(() => {
+    setRouter(getRouter());
+  }, []);
+
+  if (!router) return null;
+
   return (
     <>
       <RouterProvider router={router} />
