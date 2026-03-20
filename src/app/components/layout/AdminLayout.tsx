@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation, useNavigate } from "react-router";
 import {
   LayoutDashboard, Scissors, BookOpen, CalendarDays, Users,
   Image, Settings, Sparkles, Menu, X, Bell, Search,
-  ChevronRight, LogOut, TrendingUp
+  ChevronRight, LogOut, TrendingUp, Mail
 } from "lucide-react";
 
 const SIDEBAR_ITEMS = [
@@ -12,6 +12,7 @@ const SIDEBAR_ITEMS = [
   { label: "Services", href: "/admin/services", icon: Scissors },
   { label: "Blog Posts", href: "/admin/blog", icon: BookOpen },
   { label: "Customers", href: "/admin/customers", icon: Users },
+  { label: "Contacts", href: "/admin/contacts", icon: Mail },
   { label: "Media Library", href: "/admin/media", icon: Image },
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];
