@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "../styles/index.css";
-import { Navbar, Footer } from "@/components/layout/PublicLayout";
 
 export const metadata: Metadata = {
     metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://lamdep.vercel.app"),
@@ -53,9 +52,7 @@ export default function RootLayout({
                 />
             </head>
             <body style={{ fontFamily: "'Inter', sans-serif" }} className="min-h-screen bg-gradient-to-br from-[#FFD6BE]/30 via-white to-[#FEAEA7]/20 text-gray-900">
-                <Navbar />
                 <main>{children}</main>
-                <Footer />
             </body>
         </html>
     );

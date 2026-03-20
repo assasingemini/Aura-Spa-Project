@@ -20,6 +20,7 @@ import { AdminBookings } from "./pages/admin/AdminBookings";
 import { AdminCustomers } from "./pages/admin/AdminCustomers";
 import { AdminMedia } from "./pages/admin/AdminMedia";
 import { AdminSettings } from "./pages/admin/AdminSettings";
+import { AdminContacts } from "./pages/admin/AdminContacts";
 
 export const router = createBrowserRouter([
   {
@@ -51,6 +52,7 @@ export const router = createBrowserRouter([
       { path: "customers", Component: AdminCustomers },
       { path: "media", Component: AdminMedia },
       { path: "settings", Component: AdminSettings },
+      { path: "contacts", Component: AdminContacts },
     ],
   },
 ]);
