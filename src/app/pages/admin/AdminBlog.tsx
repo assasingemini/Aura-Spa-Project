@@ -1,26 +1,56 @@
-import { useState } from "react";
-import { Plus, Pencil, Trash2, Search, Clock, X, Save } from "lucide-react";
-import { blogPosts as initialPosts, BlogPost } from "../../data/mockData";
+import { useEffect, useState } from "react";
+import { Plus, Pencil, Trash2, Search, Clock, X, Save, Loader2 } from "lucide-react";
+import { BlogPost } from "../../data/mockData";
 import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
 import { toast } from "sonner";
 
 const SERIF = { fontFamily: "'Playfair Display', serif" };
 
 export function AdminBlog() {
-  const [posts, setPosts] = useState(initialPosts);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [editPost, setEditPost] = useState<BlogPost | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
-  const filtered = posts.filter((p) =>
-    p.title.toLowerCase().includes(search.toLowerCase()) ||
-    p.category.toLowerCase().includes(search.toLowerCase())
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/posts", { cache: "no-store" });
+      if (!res.ok) {
+        console.error(`Posts API failed with status ${res.status}`);
+        setPosts([]);
+        return;
+      }
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setPosts(data);
+      } else {
+        console.error("Received non-array posts data:", data);
+        setPosts([]);
+        if (data.error) toast.error(data.error);
+      }
+    } catch (error) {
+      toast.error("Failed to load posts");
+      setPosts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filtered = (Array.isArray(posts) ? posts : []).filter((p) =>
+    (p.title || "").toLowerCase().includes(search.toLowerCase()) ||
+    (p.category || "").toLowerCase().includes(search.toLowerCase())
   );
 
   const openNew = () => {
     setEditPost({
-      id: Date.now().toString(),
+      id: "",
       slug: "",
       title: "",
       category: "Skincare",
@@ -29,6 +59,7 @@ export function AdminBlog() {
       date: new Date().toLocaleDateString("en", { month: "long", day: "numeric", year: "numeric" }),
       readTime: "5 min read",
       excerpt: "",
+      content: "",
       featured: false,
       tags: [],
     });
@@ -40,24 +71,40 @@ export function AdminBlog() {
     setShowModal(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!editPost) return;
-    const exists = posts.find((p) => p.id === editPost.id);
-    if (exists) {
-      setPosts(posts.map((p) => p.id === editPost.id ? editPost : p));
-      toast.success("Post updated");
-    } else {
-      setPosts([editPost, ...posts]);
-      toast.success("Post created");
+    
+    try {
+      const isNew = !editPost.id;
+      const method = isNew ? "POST" : "PUT";
+      const res = await fetch("/api/posts", {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editPost),
+      });
+
+      if (!res.ok) throw new Error("Failed to save");
+
+      toast.success(isNew ? "Post created" : "Post updated");
+      fetchPosts();
+      setShowModal(false);
+      setEditPost(null);
+    } catch (error) {
+      toast.error("Error saving post");
     }
-    setShowModal(false);
-    setEditPost(null);
   };
 
-  const handleDelete = (id: string) => {
-    setPosts(posts.filter((p) => p.id !== id));
-    setDeleteConfirm(null);
-    toast.success("Post deleted");
+  const handleDelete = async (id: string) => {
+    try {
+      const res = await fetch(`/api/posts?id=${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Delete failed");
+      
+      toast.success("Post deleted");
+      fetchPosts();
+      setDeleteConfirm(null);
+    } catch (error) {
+      toast.error("Error deleting post");
+    }
   };
 
   const CATEGORIES = ["Skincare", "Massage", "Wellness", "Lifestyle", "Body Treatments"];
@@ -103,40 +150,46 @@ export function AdminBlog() {
         />
       </div>
 
-      <div className="space-y-4">
-        {filtered.map((post) => (
-          <div key={post.id} className="flex gap-5 p-5 rounded-2xl bg-white border border-pink-100 hover:border-pink-300/60 hover:shadow-md hover:shadow-pink-100/40 transition-all">
-            <div className="w-24 h-20 rounded-xl overflow-hidden shrink-0 border border-pink-100">
-              <ImageWithFallback src={post.image} alt={post.title} className="w-full h-full object-cover" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-3 mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-full bg-pink-50 border border-pink-200/60 text-pink-600 text-xs">{post.category}</span>
-                  {post.featured && <span className="px-2.5 py-0.5 rounded-full bg-green-50 border border-green-200 text-green-600 text-xs">✨ Featured</span>}
+      {loading ? (
+        <div className="flex items-center justify-center py-24">
+          <Loader2 className="w-8 h-8 text-pink-500 animate-spin" />
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {filtered.map((post) => (
+            <div key={post.id} className="flex gap-5 p-5 rounded-2xl bg-white border border-pink-100 hover:border-pink-300/60 hover:shadow-md hover:shadow-pink-100/40 transition-all">
+              <div className="w-24 h-20 rounded-xl overflow-hidden shrink-0 border border-pink-100">
+                <ImageWithFallback src={post.image} alt={post.title} className="w-full h-full object-cover" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full bg-pink-50 border border-pink-200/60 text-pink-600 text-xs">{post.category}</span>
+                    {post.featured && <span className="px-2.5 py-0.5 rounded-full bg-green-50 border border-green-200 text-green-600 text-xs">✨ Featured</span>}
+                  </div>
+                  <div className="flex gap-2 shrink-0">
+                    <button onClick={() => openEdit(post)} className="p-1.5 rounded-lg bg-pink-50 border border-pink-200/60 text-pink-400 hover:text-pink-600 hover:bg-pink-100 text-xs transition-all">
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
+                    <button onClick={() => setDeleteConfirm(post.id)} className="p-1.5 rounded-lg bg-red-50 border border-red-200 text-red-400 hover:text-red-600 hover:bg-red-100 text-xs transition-all">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-2 shrink-0">
-                  <button onClick={() => openEdit(post)} className="p-1.5 rounded-lg bg-pink-50 border border-pink-200/60 text-pink-400 hover:text-pink-600 hover:bg-pink-100 text-xs transition-all">
-                    <Pencil className="w-3.5 h-3.5" />
-                  </button>
-                  <button onClick={() => setDeleteConfirm(post.id)} className="p-1.5 rounded-lg bg-red-50 border border-red-200 text-red-400 hover:text-red-600 hover:bg-red-100 text-xs transition-all">
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                <h3 className="text-gray-900 font-medium text-sm mb-1 line-clamp-1">{post.title}</h3>
+                <p className="text-gray-400 text-xs line-clamp-2 mb-2">{post.excerpt}</p>
+                <div className="flex items-center gap-3 text-gray-400 text-xs">
+                  <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-pink-300" />{post.readTime}</span>
+                  <span>·</span>
+                  <span>{post.author.name}</span>
+                  <span>·</span>
+                  <span>{post.date}</span>
                 </div>
               </div>
-              <h3 className="text-gray-900 font-medium text-sm mb-1 line-clamp-1">{post.title}</h3>
-              <p className="text-gray-400 text-xs line-clamp-2 mb-2">{post.excerpt}</p>
-              <div className="flex items-center gap-3 text-gray-400 text-xs">
-                <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-pink-300" />{post.readTime}</span>
-                <span>·</span>
-                <span>{post.author.name}</span>
-                <span>·</span>
-                <span>{post.date}</span>
-              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Edit Modal */}
       {showModal && editPost && (
@@ -182,13 +235,39 @@ export function AdminBlog() {
                 </div>
               </div>
               <div>
+                <label className="text-gray-500 text-sm mb-1.5 block">Image URL</label>
+                <div className="flex gap-4 items-start">
+                  <input
+                    value={editPost.image}
+                    onChange={(e) => setEditPost({ ...editPost, image: e.target.value })}
+                    className="flex-1 bg-pink-50/40 border border-pink-200/60 rounded-xl px-4 py-3 text-gray-800 text-sm focus:outline-none focus:border-pink-400 focus:bg-white transition-colors"
+                    placeholder="https://images.unsplash.com/..."
+                  />
+                  {editPost.image && (
+                    <div className="w-12 h-12 rounded-lg overflow-hidden border border-pink-100 shrink-0">
+                      <img src={editPost.image} alt="Preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div>
                 <label className="text-gray-500 text-sm mb-1.5 block">Excerpt</label>
                 <textarea
                   value={editPost.excerpt}
                   onChange={(e) => setEditPost({ ...editPost, excerpt: e.target.value })}
-                  rows={3}
+                  rows={2}
                   className="w-full bg-pink-50/40 border border-pink-200/60 rounded-xl px-4 py-3 text-gray-800 text-sm focus:outline-none focus:border-pink-400 focus:bg-white transition-colors resize-none"
                   placeholder="Brief summary..."
+                />
+              </div>
+              <div>
+                <label className="text-gray-500 text-sm mb-1.5 block">Content (Article Body)</label>
+                <textarea
+                  value={editPost.content || ""}
+                  onChange={(e) => setEditPost({ ...editPost, content: e.target.value })}
+                  rows={6}
+                  className="w-full bg-pink-50/40 border border-pink-200/60 rounded-xl px-4 py-3 text-gray-800 text-sm focus:outline-none focus:border-pink-400 focus:bg-white transition-colors resize-none"
+                  placeholder="Write your article here..."
                 />
               </div>
               <div>

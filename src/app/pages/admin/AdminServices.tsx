@@ -1,26 +1,71 @@
-import { useState } from "react";
-import { Plus, Pencil, Trash2, Search, Clock, X, Save } from "lucide-react";
-import { services as initialServices, Service } from "../../data/mockData";
+import { useEffect, useState } from "react";
+import { Plus, Pencil, Trash2, Search, Clock, X, Save, Loader2 } from "lucide-react";
+import { Service } from "../../data/mockData";
 import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
 import { toast } from "sonner";
 
 const SERIF = { fontFamily: "'Playfair Display', serif" };
 
 export function AdminServices() {
-  const [services, setServices] = useState(initialServices);
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
-  const filtered = services.filter((s) =>
-    s.title.toLowerCase().includes(search.toLowerCase()) ||
-    s.category.toLowerCase().includes(search.toLowerCase())
+  useEffect(() => {
+    fetchServices();
+  }, []);
+
+  const fetchServices = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/services", { cache: "no-store" });
+      if (!res.ok) {
+        console.error(`Services API failed with status ${res.status}`);
+        setServices([]);
+        return;
+      }
+      const data = await res.json();
+      
+      if (Array.isArray(data)) {
+        // Map Prisma model to UI Service type
+        const mapped = data.map((s: any) => ({
+          id: s.id,
+          slug: s.slug || "",
+          title: s.name,
+          description: s.description,
+          price: s.price,
+          duration: `${s.duration} min`,
+          image: s.imageUrl || "",
+          category: s.category || "General",
+          benefits: [],
+          featured: s.published || false,
+          shortDescription: (s.description || "").slice(0, 100) + "...",
+        }));
+        setServices(mapped);
+      } else {
+        console.error("Received non-array services data:", data);
+        setServices([]);
+        if (data.error) toast.error(data.error);
+      }
+    } catch (error) {
+      toast.error("Failed to load services");
+      setServices([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filtered = (Array.isArray(services) ? services : []).filter((s) =>
+    (s.title || "").toLowerCase().includes(search.toLowerCase()) ||
+    (s.category || "").toLowerCase().includes(search.toLowerCase())
   );
 
   const openNew = () => {
     setEditingService({
-      id: Date.now().toString(),
+      id: "",
       slug: "",
       title: "",
       category: "Facial Treatments",
@@ -40,24 +85,40 @@ export function AdminServices() {
     setShowModal(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!editingService) return;
-    const exists = services.find((s) => s.id === editingService.id);
-    if (exists) {
-      setServices(services.map((s) => s.id === editingService.id ? editingService : s));
-      toast.success("Service updated successfully");
-    } else {
-      setServices([...services, editingService]);
-      toast.success("Service created successfully");
+    
+    try {
+      const isNew = !editingService.id;
+      const method = isNew ? "POST" : "PUT";
+      const res = await fetch("/api/services", {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(editingService),
+      });
+
+      if (!res.ok) throw new Error("Failed to save");
+
+      toast.success(isNew ? "Service created" : "Service updated");
+      fetchServices();
+      setShowModal(false);
+      setEditingService(null);
+    } catch (error) {
+      toast.error("Error saving service");
     }
-    setShowModal(false);
-    setEditingService(null);
   };
 
-  const handleDelete = (id: string) => {
-    setServices(services.filter((s) => s.id !== id));
-    setDeleteConfirm(null);
-    toast.success("Service deleted");
+  const handleDelete = async (id: string) => {
+    try {
+      const res = await fetch(`/api/services?id=${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Delete failed");
+      
+      toast.success("Service deleted");
+      fetchServices();
+      setDeleteConfirm(null);
+    } catch (error) {
+      toast.error("Error deleting service");
+    }
   };
 
   const CATEGORIES = ["Facial Treatments", "Massage Therapy", "Body Treatments", "Holistic Wellness", "Hand & Nail", "Water Therapy"];
@@ -90,7 +151,12 @@ export function AdminServices() {
       </div>
 
       {/* Services Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+      {loading ? (
+        <div className="flex items-center justify-center py-24">
+          <Loader2 className="w-8 h-8 text-pink-500 animate-spin" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         {filtered.map((service) => (
           <div key={service.id} className="rounded-2xl bg-white border border-pink-100 overflow-hidden hover:border-pink-300/60 hover:shadow-lg hover:shadow-pink-100/40 transition-all">
             <div className="aspect-video relative overflow-hidden">
@@ -130,6 +196,7 @@ export function AdminServices() {
           </div>
         ))}
       </div>
+      )}
 
       {/* Edit/Add Modal */}
       {showModal && editingService && (

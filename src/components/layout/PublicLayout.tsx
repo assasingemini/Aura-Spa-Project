@@ -3,7 +3,12 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Sparkles, Instagram, Facebook, Twitter, Youtube, Mail, Phone, MapPin, ChevronRight, Heart } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
+import { 
+    Menu, X, Sparkles, Instagram, Facebook, Twitter, Youtube, 
+    Mail, Phone, MapPin, ChevronRight, Heart, 
+    LogOut, User as UserIcon, LayoutDashboard 
+} from "lucide-react";
 
 const NAV_LINKS = [
     { label: "Home", href: "/" },
@@ -15,9 +20,13 @@ const NAV_LINKS = [
 ];
 
 export function Navbar() {
+    const { data: session } = useSession();
     const [scrolled, setScrolled] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
     const pathname = usePathname();
+
+    const user = session?.user as any;
+    const isAdmin = user?.role === "ADMIN";
 
     useEffect(() => {
         const handler = () => setScrolled(window.scrollY > 60);
@@ -64,19 +73,45 @@ export function Navbar() {
                             />
                         </Link>
                     ))}
+                    {isAdmin && (
+                        <Link href="/admin" className="text-sm text-[#FF9689] font-medium flex items-center gap-1.5 hover:opacity-80 transition-opacity">
+                            <LayoutDashboard className="w-4 h-4" />
+                            Admin Panel
+                        </Link>
+                    )}
                 </div>
 
-                {/* CTA */}
+                {/* CTA / Auth */}
                 <div className="hidden lg:flex items-center gap-4">
-                    <Link href="/login" className="text-sm text-gray-500 hover:text-[#FF9689] transition-colors">
-                        Sign In
-                    </Link>
-                    <Link
-                        href="/booking"
-                        className="px-5 py-2.5 rounded-full bg-gradient-to-r from-[#FF9689] to-[#FFC6A4] text-white text-sm font-medium hover:opacity-90 hover:shadow-lg hover:shadow-[#FF9689]/40 transition-all duration-300"
-                    >
-                        Book Now
-                    </Link>
+                    {session ? (
+                        <div className="flex items-center gap-4 pl-4 border-l border-[#FEAEA7]/40">
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#FF9689] to-[#FFC6A4] flex items-center justify-center text-white text-xs font-semibold">
+                                    {user?.name?.[0] || <UserIcon className="w-4 h-4" />}
+                                </div>
+                                <span className="text-sm text-gray-700 font-medium">{user?.name}</span>
+                            </div>
+                            <button
+                                onClick={() => signOut()}
+                                className="p-2 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
+                                title="Sign Out"
+                            >
+                                <LogOut className="w-4 h-4" />
+                            </button>
+                        </div>
+                    ) : (
+                        <>
+                            <Link href="/login" className="text-sm text-gray-500 hover:text-[#FF9689] transition-colors">
+                                Sign In
+                            </Link>
+                            <Link
+                                href="/booking"
+                                className="px-5 py-2.5 rounded-full bg-gradient-to-r from-[#FF9689] to-[#FFC6A4] text-white text-sm font-medium hover:opacity-90 hover:shadow-lg hover:shadow-[#FF9689]/40 transition-all duration-300"
+                            >
+                                Book Now
+                            </Link>
+                        </>
+                    )}
                 </div>
 
                 {/* Mobile toggle */}
@@ -101,14 +136,41 @@ export function Navbar() {
                             {link.label}
                         </Link>
                     ))}
-                    <div className="pt-4 flex flex-col gap-3 border-t border-[#FEAEA7]">
-                        <Link href="/login" className="text-gray-500 text-sm hover:text-[#FF9689] py-2">Sign In</Link>
-                        <Link
-                            href="/booking"
-                            className="text-center py-3 rounded-full bg-gradient-to-r from-[#FF9689] to-[#FFC6A4] text-white text-sm font-medium"
-                        >
-                            Book Appointment
+                    {isAdmin && (
+                        <Link href="/admin" className="block text-base py-2 text-[#FF9689] font-medium border-t border-[#FEAEA7]/40 pt-4">
+                            Admin Panel
                         </Link>
+                    )}
+                    <div className="pt-4 flex flex-col gap-3 border-t border-[#FEAEA7]">
+                        {session ? (
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3 px-2 py-1">
+                                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF9689] to-[#FFC6A4] flex items-center justify-center text-white font-semibold">
+                                        {user?.name?.[0]}
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+                                        <p className="text-xs text-gray-500">{user?.email}</p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => signOut()}
+                                    className="w-full flex items-center justify-center gap-2 py-3 rounded-full border border-red-100 text-red-500 text-sm font-medium hover:bg-red-50 transition-all"
+                                >
+                                    <LogOut className="w-4 h-4" /> Sign Out
+                                </button>
+                            </div>
+                        ) : (
+                            <>
+                                <Link href="/login" className="text-gray-500 text-sm hover:text-[#FF9689] py-2">Sign In</Link>
+                                <Link
+                                    href="/booking"
+                                    className="text-center py-3 rounded-full bg-gradient-to-r from-[#FF9689] to-[#FFC6A4] text-white text-sm font-medium"
+                                >
+                                    Book Appointment
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
             )}

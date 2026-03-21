@@ -21,36 +21,45 @@ import { AdminCustomers } from "./pages/admin/AdminCustomers";
 import { AdminMedia } from "./pages/admin/AdminMedia";
 import { AdminSettings } from "./pages/admin/AdminSettings";
 
-export const router = createBrowserRouter([
-  {
-    path: "/",
-    Component: PublicLayout,
-    children: [
-      { index: true, Component: HomePage },
-      { path: "services", Component: ServicesPage },
-      { path: "about", Component: AboutPage },
-      { path: "gallery", Component: GalleryPage },
-      { path: "contact", Component: ContactPage },
-      { path: "blog", Component: BlogListPage },
-      { path: "blog/:slug", Component: BlogDetailPage },
-      { path: "booking", Component: BookingPage },
-      { path: "booking/success", Component: BookingSuccessPage },
-    ],
-  },
-  { path: "/login", Component: LoginPage },
-  { path: "/register", Component: RegisterPage },
-  { path: "/forgot-password", Component: ForgotPasswordPage },
-  {
-    path: "/admin",
-    Component: AdminLayout,
-    children: [
-      { index: true, Component: AdminDashboard },
-      { path: "services", Component: AdminServices },
-      { path: "blog", Component: AdminBlog },
-      { path: "bookings", Component: AdminBookings },
-      { path: "customers", Component: AdminCustomers },
-      { path: "media", Component: AdminMedia },
-      { path: "settings", Component: AdminSettings },
-    ],
-  },
-]);
+let router: any = null;
+
+export const getRouter = () => {
+  if (typeof window === "undefined") return null;
+  if (router) return router;
+
+  router = createBrowserRouter([
+    {
+      path: "/",
+      Component: PublicLayout,
+      children: [
+        { index: true, Component: HomePage },
+        { path: "services", Component: ServicesPage },
+        { path: "about", Component: AboutPage },
+        { path: "gallery", Component: GalleryPage },
+        { path: "contact", Component: ContactPage },
+        { path: "blog", Component: BlogListPage },
+        { path: "blog/:slug", Component: BlogDetailPage },
+        { path: "booking", Component: BookingPage },
+        { path: "booking/success", Component: BookingSuccessPage },
+      ],
+    },
+    { path: "/login", Component: LoginPage },
+    { path: "/register", Component: RegisterPage },
+    { path: "/forgot-password", Component: ForgotPasswordPage },
+    {
+      path: "/admin",
+      Component: AdminLayout,
+      children: [
+        { index: true, Component: AdminDashboard },
+        { path: "services", Component: AdminServices },
+        { path: "blog", Component: AdminBlog },
+        { path: "bookings", Component: AdminBookings },
+        { path: "customers", Component: AdminCustomers },
+        { path: "media", Component: AdminMedia },
+        { path: "settings", Component: AdminSettings },
+      ],
+    },
+  ]);
+  
+  return router;
+};
