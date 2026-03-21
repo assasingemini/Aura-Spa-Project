@@ -12,6 +12,15 @@ export const IMAGES = {
   glowingSkin: "https://images.unsplash.com/photo-1579801874037-f28c38c7edbf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800",
   blog1: "https://images.unsplash.com/photo-1658501833982-b153633f7177?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800",
   elegantSpa: "https://images.unsplash.com/photo-1630595633877-9918ee257288?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800",
+  // About page - spa spaces
+  spaReception: "https://images.unsplash.com/photo-1650532897813-d92427f7d229?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800",
+  treatmentRoom: "https://images.unsplash.com/photo-1700142360825-d21edc53c8db?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800",
+  relaxLounge: "https://images.unsplash.com/photo-1540555700478-4be289fbec6f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800",
+  spaGarden: "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800",
+  spaProducts: "https://images.unsplash.com/photo-1640791416299-25645e72d186?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800",
+  spaCandles: "https://images.unsplash.com/photo-1595788088802-0e32ff9306f6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800",
+  spaStones: "https://images.unsplash.com/photo-1680163660834-fa4f67748e21?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800",
+  spaFlowers: "https://images.unsplash.com/photo-1669281392832-9181a2b484af?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800",
 };
 
 // ─── Services ───────────────────────────────────────────────────────────────
@@ -27,6 +36,7 @@ export interface Service {
   description: string;
   benefits: string[];
   featured: boolean;
+  detailedSteps: string[];
 }
 
 export const services: Service[] = [
@@ -42,6 +52,15 @@ export const services: Service[] = [
     description: "Experience the pinnacle of skincare with our Signature Facial — a bespoke treatment crafted for your unique skin type. Using the finest botanical extracts and cutting-edge technologies, our expert aestheticians deliver a transformative experience that leaves your skin luminous, hydrated, and visibly younger.",
     benefits: ["Deep pore cleansing", "Advanced hydration", "Radiance boost", "Anti-aging peptides", "Custom mask therapy"],
     featured: true,
+    detailedSteps: [
+      "Skin analysis & consultation with our expert aesthetician",
+      "Gentle double cleansing with botanical milk & micellar water",
+      "Steam therapy to open pores & soften impurities",
+      "Professional extraction & deep pore purification",
+      "Customized serum application with LED light therapy",
+      "Hydrating mask tailored to your skin type",
+      "Finishing moisturizer, SPF & facial massage"
+    ],
   },
   {
     id: "2",
@@ -55,6 +74,15 @@ export const services: Service[] = [
     description: "Surrender to the therapeutic warmth of smooth basalt stones expertly placed and glided across tense muscles. This time-honored ritual melts away stress, improves circulation, and restores deep muscular balance. Paired with our signature aromatherapy oils, it's the ultimate relaxation experience.",
     benefits: ["Deep muscle relaxation", "Improved circulation", "Stress relief", "Pain reduction", "Better sleep quality"],
     featured: true,
+    detailedSteps: [
+      "Warm welcome with herbal tea & relaxation music",
+      "Full-body dry brushing to stimulate circulation",
+      "Heated basalt stones placed along energy meridians",
+      "Deep tissue massage with warm stone gliding technique",
+      "Targeted pressure point therapy on back & shoulders",
+      "Cool stone finish to close pores & energize skin",
+      "Final relaxation with aromatherapy inhalation"
+    ],
   },
   {
     id: "3",
@@ -68,6 +96,14 @@ export const services: Service[] = [
     description: "Immerse yourself in the healing power of pure essential oils in this deeply restorative ritual. Our therapists curate a bespoke blend tailored to your emotional and physical needs, delivering profound relaxation through aromatherapy massage, steam therapy, and mindful breathing techniques.",
     benefits: ["Emotional balance", "Stress reduction", "Respiratory clarity", "Immune support", "Mental clarity"],
     featured: true,
+    detailedSteps: [
+      "Personal scent consultation & mood assessment",
+      "Custom essential oil blend creation just for you",
+      "Warm towel preparation & gentle exfoliation",
+      "Full-body aromatherapy massage with your custom blend",
+      "Herbal steam inhalation therapy",
+      "Guided mindful breathing & deep relaxation"
+    ],
   },
   {
     id: "4",
@@ -81,6 +117,15 @@ export const services: Service[] = [
     description: "Our signature Body Wrap Therapy is a full-body transformation ritual. We begin with a full-body exfoliation using our mineral-rich scrub, followed by application of our proprietary detoxifying wrap. While cocooned, enjoy a scalp massage. Finish with a deeply moisturizing full-body massage.",
     benefits: ["Full-body detox", "Skin firming", "Deep nourishment", "Improved tone & texture", "Lymphatic drainage"],
     featured: false,
+    detailedSteps: [
+      "Full-body dry brush exfoliation to remove dead skin cells",
+      "Mineral-rich body scrub application & rinse",
+      "Warm detoxifying mud or seaweed wrap cocoon",
+      "Scalp & face massage while body absorbs nutrients",
+      "Gentle unwrap & warm shower rinse",
+      "Deeply moisturizing full-body massage with botanical oils",
+      "Hydrating body lotion application & herbal tea"
+    ],
   },
   {
     id: "5",
@@ -94,6 +139,14 @@ export const services: Service[] = [
     description: "Elevate your nail experience with our Luxury Manicure. Using premium French brands and expert techniques, we transform your hands and nails into works of art. Includes cuticle care, nail shaping, paraffin treatment, hand massage, and your choice of gel or classic polish.",
     benefits: ["Nail strengthening", "Cuticle repair", "Hand rejuvenation", "Lasting polish", "Relaxing hand massage"],
     featured: false,
+    detailedSteps: [
+      "Hand soak in warm rose-infused water",
+      "Cuticle softening, shaping & expert nail trimming",
+      "Exfoliating hand scrub with natural ingredients",
+      "Warm paraffin wax treatment for deep moisturizing",
+      "Relaxing hand & forearm massage",
+      "Nail buffing & your choice of gel or classic polish"
+    ],
   },
   {
     id: "6",
@@ -107,6 +160,14 @@ export const services: Service[] = [
     description: "Step into our private hydrotherapy pool where therapeutic water jets target specific muscle groups for profound relief. The carefully controlled temperature and mineral-infused water creates an environment of total healing. Perfect for athletic recovery, joint pain relief, and deep relaxation.",
     benefits: ["Joint pain relief", "Muscle recovery", "Improved mobility", "Stress reduction", "Circulation boost"],
     featured: false,
+    detailedSteps: [
+      "Welcome drink & health questionnaire",
+      "Guided warm-up stretching in our relaxation area",
+      "Entry into mineral-infused heated hydrotherapy pool",
+      "Targeted jet massage therapy for specific muscle groups",
+      "Alternating warm & cool water cycles for circulation",
+      "Post-pool relaxation with herbal infusion & warm towels"
+    ],
   },
   {
     id: "7",
@@ -120,6 +181,16 @@ export const services: Service[] = [
     description: "Our most advanced facial combines microdermabrasion, LED light therapy, and our exclusive peptide complex to dramatically reduce fine lines and restore youthful elasticity. Using clinical-grade ingredients and proven techniques, this treatment delivers visible results from the very first session.",
     benefits: ["Fine line reduction", "Elasticity restoration", "Pigmentation correction", "Deep hydration", "Collagen stimulation"],
     featured: true,
+    detailedSteps: [
+      "Advanced skin analysis with digital magnification",
+      "Enzyme-based double cleansing & pH balancing",
+      "Microdermabrasion for cell renewal & exfoliation",
+      "Exclusive peptide complex serum application",
+      "LED red-light therapy for collagen stimulation",
+      "Lifting face massage with firming techniques",
+      "Intensive anti-aging mask with hyaluronic acid",
+      "SPF finishing cream & personalized homecare plan"
+    ],
   },
   {
     id: "8",
@@ -133,6 +204,16 @@ export const services: Service[] = [
     description: "Our comprehensive Full Body Massage is a symphony of relaxation techniques combined into one indulgent experience. Our therapists work methodically through every area of the body using Swedish, deep tissue, and reflexology techniques, leaving you completely rejuvenated.",
     benefits: ["Complete relaxation", "Tension release", "Improved sleep", "Enhanced wellbeing", "Energy restoration"],
     featured: false,
+    detailedSteps: [
+      "Pre-treatment consultation & pressure preference discussion",
+      "Warm oil selection from our premium aromatherapy range",
+      "Swedish massage technique for overall relaxation",
+      "Deep tissue work on back, neck & shoulder tension",
+      "Leg & arm massage with circulation-boosting strokes",
+      "Reflexology foot massage targeting pressure points",
+      "Scalp & head massage for total relaxation",
+      "Post-treatment stretching & hydration"
+    ],
   },
 ];
 
@@ -515,4 +596,72 @@ export const serviceDistribution = [
   { name: "Body Treatments", value: 18, color: "#A78BFA" },
   { name: "Holistic Wellness", value: 12, color: "#60A5FA" },
   { name: "Hand & Nail", value: 7, color: "#93C5FD" },
+];
+
+// ─── Customer Reviews (About Page) ───────────────────────────────────────────
+export interface CustomerReview {
+  id: string;
+  name: string;
+  avatar: string;
+  rating: number;
+  quote: string;
+  treatment: string;
+  date: string;
+}
+
+export const customerReviews: CustomerReview[] = [
+  {
+    id: "r1",
+    name: "Nguyễn Minh Anh",
+    avatar: "MA",
+    rating: 5,
+    quote: "Không gian tại AURA thực sự sang trọng và thư giãn. Tôi đã trải nghiệm dịch vụ Signature Facial và cảm thấy làn da mình được tái sinh hoàn toàn. Đội ngũ chuyên gia rất tận tâm và chuyên nghiệp!",
+    treatment: "Signature Facial",
+    date: "Tháng 2, 2026",
+  },
+  {
+    id: "r2",
+    name: "Trần Thị Thu Hà",
+    avatar: "TH",
+    rating: 5,
+    quote: "Hot Stone Massage tại đây thực sự tuyệt vời. Sau buổi trị liệu, tôi cảm thấy mọi căng thẳng đều tan biến. Tinh dầu được sử dụng rất cao cấp và hương thơm dễ chịu.",
+    treatment: "Hot Stone Massage",
+    date: "Tháng 1, 2026",
+  },
+  {
+    id: "r3",
+    name: "Phạm Quốc Bảo",
+    avatar: "QB",
+    rating: 5,
+    quote: "Tôi đưa vợ đến AURA nhân dịp kỷ niệm và cả hai đều rất hài lòng. Dịch vụ Body Wrap Therapy giúp cơ thể nhẹ nhàng, làn da mềm mịn hơn hẳn. Chắc chắn sẽ quay lại!",
+    treatment: "Body Wrap Therapy",
+    date: "Tháng 3, 2026",
+  },
+  {
+    id: "r4",
+    name: "Lê Hoàng Yến",
+    avatar: "HY",
+    rating: 5,
+    quote: "Đây là spa đẳng cấp nhất mà tôi từng trải nghiệm. Quy trình Anti-Aging Facial rất chuyên nghiệp, kết quả thấy rõ ngay sau lần đầu tiên. Đáng từng đồng!",
+    treatment: "Anti-Aging Facial",
+    date: "Tháng 2, 2026",
+  },
+  {
+    id: "r5",
+    name: "Vũ Thị Mai Linh",
+    avatar: "ML",
+    rating: 5,
+    quote: "Aromatherapy Ritual là liệu trình mà tôi yêu thích nhất. Tinh dầu được pha chế riêng cho từng khách, và không gian phòng trị liệu cực kỳ ấm cúng. Giấc ngủ của tôi tốt hơn rất nhiều!",
+    treatment: "Aromatherapy Ritual",
+    date: "Tháng 1, 2026",
+  },
+  {
+    id: "r6",
+    name: "Đặng Minh Tuấn",
+    avatar: "MT",
+    rating: 5,
+    quote: "Full Body Massage ở đây kết hợp nhiều kỹ thuật khác nhau, từ Swedish đến deep tissue. Kỹ thuật viên rất hiểu cơ thể và biết chính xác điểm nào cần tập trung.",
+    treatment: "Full Body Massage",
+    date: "Tháng 3, 2026",
+  },
 ];
