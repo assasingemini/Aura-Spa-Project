@@ -39,6 +39,8 @@ export const metadata: Metadata = {
     },
 };
 
+import { Providers } from "./providers";
+
 export default function RootLayout({
     children,
 }: {
@@ -53,9 +55,11 @@ export default function RootLayout({
                 />
             </head>
             <body style={{ fontFamily: "'Inter', sans-serif" }} className="min-h-screen bg-gradient-to-br from-[#FFD6BE]/30 via-white to-[#FEAEA7]/20 text-gray-900">
-                <Navbar />
-                <main>{children}</main>
-                <Footer />
+                <Providers>
+                    <Navbar />
+                    <main>{children}</main>
+                    <Footer />
+                </Providers>
             </body>
         </html>
     );

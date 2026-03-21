@@ -1,7 +1,9 @@
-import { TrendingUp, TrendingDown, Users, CalendarDays, DollarSign, Star, ArrowRight, Clock } from "lucide-react";
+import { useEffect, useState } from "react";
+import { TrendingUp, TrendingDown, Users, CalendarDays, DollarSign, Star, ArrowRight, Clock, Loader2 } from "lucide-react";
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Link } from "react-router";
-import { revenueData, serviceDistribution, adminBookings } from "../../data/mockData";
+import { revenueData, serviceDistribution, Booking } from "../../data/mockData";
+import { toast } from "sonner";
 
 const SERIF = { fontFamily: "'Playfair Display', serif" };
 
@@ -29,7 +31,37 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export function AdminDashboard() {
-  const recentBookings = adminBookings.slice(0, 5);
+  const [recentBookings, setRecentBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRecent = async () => {
+      try {
+        const res = await fetch("/api/bookings", { cache: "no-store" });
+        if (!res.ok) {
+          console.error(`Bookings API failed with status ${res.status}`);
+          const errData = await res.json().catch(() => ({}));
+          console.error("Error details:", errData);
+          setRecentBookings([]);
+          return;
+        }
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setRecentBookings(data.slice(0, 5));
+        } else {
+          console.error("Received non-array bookings data in dashboard:", data);
+          setRecentBookings([]);
+        }
+      } catch (error) {
+        console.error("Dashboard fetch error:", error);
+        toast.error("Failed to load dashboard data");
+        setRecentBookings([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRecent();
+  }, []);
 
   const statusColor: Record<string, string> = {
     confirmed: "bg-green-50 text-green-600 border-green-200",
@@ -44,7 +76,7 @@ export function AdminDashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 style={SERIF} className="text-gray-900 text-2xl font-semibold">Dashboard Overview</h1>
-          <p className="text-gray-400 text-sm mt-1">Saturday, March 14, 2026</p>
+          <p className="text-gray-400 text-sm mt-1">{new Date().toLocaleDateString("en", { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
         </div>
         <Link
           to="/booking"
@@ -179,43 +211,54 @@ export function AdminDashboard() {
             </Link>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-pink-50/80">
-                  <th className="px-6 py-3 text-left text-gray-400 text-xs uppercase tracking-wider">Client</th>
-                  <th className="px-6 py-3 text-left text-gray-400 text-xs uppercase tracking-wider">Service</th>
-                  <th className="px-6 py-3 text-left text-gray-400 text-xs uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-3 text-left text-gray-400 text-xs uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-right text-gray-400 text-xs uppercase tracking-wider">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentBookings.map((b, i) => (
-                  <tr key={b.id} className={`border-b border-pink-50/60 hover:bg-pink-50/30 transition-colors ${i === recentBookings.length - 1 ? "border-transparent" : ""}`}>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#EC4899] to-[#A855F7] flex items-center justify-center text-white text-xs font-semibold shrink-0">
-                          {b.customer.split(" ").map((n) => n[0]).join("").slice(0, 2)}
-                        </div>
-                        <span className="text-gray-800 text-sm">{b.customer}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-gray-500 text-sm">{b.service}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-1.5 text-gray-400 text-xs">
-                        <Clock className="w-3 h-3" /> {b.date} · {b.time}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex px-2.5 py-1 rounded-full text-xs border capitalize ${statusColor[b.status]}`}>
-                        {b.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right text-gray-900 font-medium text-sm">${b.amount}</td>
+            {loading ? (
+              <div className="flex items-center justify-center py-24">
+                <Loader2 className="w-8 h-8 text-pink-500 animate-spin" />
+              </div>
+            ) : (
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-pink-50/80">
+                    <th className="px-6 py-3 text-left text-gray-400 text-xs uppercase tracking-wider">Client</th>
+                    <th className="px-6 py-3 text-left text-gray-400 text-xs uppercase tracking-wider">Service</th>
+                    <th className="px-6 py-3 text-left text-gray-400 text-xs uppercase tracking-wider">Date</th>
+                    <th className="px-6 py-3 text-left text-gray-400 text-xs uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-right text-gray-400 text-xs uppercase tracking-wider">Amount</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {recentBookings.map((b, i) => (
+                    <tr key={b.id} className={`border-b border-pink-50/60 hover:bg-pink-50/30 transition-colors ${i === recentBookings.length - 1 ? "border-transparent" : ""}`}>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#EC4899] to-[#A855F7] flex items-center justify-center text-white text-xs font-semibold shrink-0">
+                            {b.customer.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+                          </div>
+                          <span className="text-gray-800 text-sm">{b.customer}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-gray-500 text-sm">{b.service}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-1.5 text-gray-400 text-xs">
+                          <Clock className="w-3 h-3 text-pink-300" /> {b.date} · {b.time}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex px-2.5 py-1 rounded-full text-xs border capitalize ${statusColor[b.status]}`}>
+                          {b.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right text-gray-900 font-medium text-sm">${b.amount}</td>
+                    </tr>
+                  ))}
+                  {recentBookings.length === 0 && (
+                    <tr>
+                      <td colSpan={5} className="px-6 py-12 text-center text-gray-400 text-sm">No recent bookings</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
 

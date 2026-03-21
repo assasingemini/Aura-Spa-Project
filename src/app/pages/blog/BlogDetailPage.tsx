@@ -1,69 +1,69 @@
+import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router";
-import { ArrowLeft, Clock, Share2, Twitter, Facebook, Link2, Sparkles, BookOpen } from "lucide-react";
-import { blogPosts } from "../../data/mockData";
+import { ArrowLeft, Clock, Share2, Twitter, Facebook, Link2, Sparkles, BookOpen, Loader2 } from "lucide-react";
+import { blogPosts as mockPosts } from "../../data/mockData";
 import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
 import { toast } from "sonner";
 
 const SERIF = { fontFamily: "'Playfair Display', serif" };
 
-const ARTICLE_CONTENT = `
-## Introduction
-
-The journey to radiant, healthy skin begins with understanding the fundamental principles of skincare. At AURA, we believe that every person deserves to feel confident in their skin — and our treatments are designed with exactly that goal in mind.
-
-## The Science Behind It
-
-Modern skincare science has made remarkable advances in recent years. What was once considered impossible — reversing signs of aging, restoring deep hydration, correcting hyperpigmentation — is now achievable with the right combination of active ingredients and professional techniques.
-
-Our team of expert aestheticians stay at the forefront of these developments, continuously updating their knowledge and techniques to deliver the most effective treatments available.
-
-## Key Principles
-
-**1. Consistency is Everything**
-
-The most beautiful skin doesn't come from a single treatment — it comes from a consistent, thoughtful routine. Whether you visit us monthly or weekly, maintaining regularity in your skincare regimen is what creates lasting transformation.
-
-**2. Personalization Matters**
-
-No two skins are alike. What works for one person may be completely wrong for another. This is why every AURA treatment begins with a thorough consultation to understand your unique skin type, concerns, and goals.
-
-**3. Quality Ingredients Are Non-Negotiable**
-
-We exclusively use professional-grade products formulated with the highest quality active ingredients. From Swiss botanical extracts to advanced peptide complexes, every ingredient in our treatments has been carefully selected for maximum efficacy.
-
-## Our Recommended Approach
-
-Based on years of treating thousands of clients, here is what we recommend for most skin types...
-
-The journey begins with proper cleansing — removing the day's accumulation of pollutants, makeup, and environmental damage. This isn't just about cleaning the surface; it's about preparing the skin to receive the nourishing treatments that follow.
-
-## Results You Can Expect
-
-With consistent professional treatment and a good home care routine, most clients see visible improvements within 4-6 weeks. These include:
-
-- Improved skin texture and tone
-- Reduced appearance of fine lines
-- More even complexion
-- Enhanced natural radiance
-- Stronger skin barrier function
-
-## Conclusion
-
-Your skin is your largest organ and deserves the finest care. At AURA, we are honored to be your partners on the journey to your most radiant self. Every treatment we perform, every product we recommend, every piece of advice we share — all of it is in service of your skin's health and beauty.
-`;
-
 export function BlogDetailPage() {
   const { slug } = useParams();
-  const post = blogPosts.find((p) => p.slug === slug) || blogPosts[0];
-  const related = blogPosts.filter((p) => p.id !== post.id && p.category === post.category).slice(0, 3);
-  const otherRelated = blogPosts.filter((p) => p.id !== post.id).slice(0, 3 - related.length);
+  const [post, setPost] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [posts, setPosts] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch current post
+        const res = await fetch(`/api/posts?slug=${slug}`);
+        const data = await res.json();
+        
+        // Fetch all posts for related section
+        const allRes = await fetch("/api/posts");
+        const allData = await allRes.json();
+        const availablePosts = allData.length > 0 ? allData : mockPosts;
+        setPosts(availablePosts);
+
+        if (data && !data.error) {
+          setPost(data);
+        } else {
+          setPost(availablePosts.find((p: any) => p.slug === slug) || availablePosts[0]);
+        }
+      } catch (err) {
+        console.error("Failed to fetch post:", err);
+        setPost(mockPosts.find((p) => p.slug === slug) || mockPosts[0]);
+        setPosts(mockPosts);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white pt-24">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-[#FF9689] animate-spin mx-auto mb-4" />
+          <p className="text-gray-500 font-serif text-lg">Loading your wellness story...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!post) return null;
+
+  const related = posts.filter((p) => p.id !== post.id && p.category === post.category).slice(0, 3);
+  const otherRelated = posts.filter((p) => p.id !== post.id).slice(0, 3 - related.length);
   const allRelated = [...related, ...otherRelated].slice(0, 3);
+
+  const articleContent = post.content || "";
 
   const tocItems = [
     "Introduction",
-    "The Science Behind It",
     "Key Principles",
-    "Our Recommended Approach",
     "Results You Can Expect",
     "Conclusion",
   ];
@@ -145,7 +145,7 @@ export function BlogDetailPage() {
                 "{post.excerpt}"
               </p>
 
-              {ARTICLE_CONTENT.split("\n\n").map((block, i) => {
+              {articleContent.split("\n\n").map((block: string, i: number) => {
                 if (block.startsWith("## ")) {
                   return (
                     <h2 key={i} style={SERIF} className="text-3xl font-semibold mt-12 mb-6 text-gray-900 flex items-center gap-3">
@@ -284,7 +284,7 @@ export function BlogDetailPage() {
               <div className="p-8 rounded-3xl bg-white border border-[#FFC5C1]/50 shadow-sm">
                 <h3 style={SERIF} className="text-gray-900 text-lg font-semibold mb-6">Latest Posts</h3>
                 <div className="space-y-5">
-                  {blogPosts.slice(0, 3).map((p) => (
+                  {posts.slice(0, 3).map((p) => (
                     <Link key={p.id} to={`/blog/${p.slug}`} className="flex gap-4 group">
                       <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 shadow-sm">
                         <ImageWithFallback src={p.image} alt={p.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />

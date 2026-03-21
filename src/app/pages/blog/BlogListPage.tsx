@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router";
-import { ArrowRight, Search, Clock, Sparkles, TrendingUp } from "lucide-react";
-import { blogPosts } from "../../data/mockData";
+import { ArrowRight, Search, Clock, Sparkles, TrendingUp, Loader2 } from "lucide-react";
+import { blogPosts as mockPosts } from "../../data/mockData";
 import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
 
 const SERIF = { fontFamily: "'Playfair Display', serif" };
@@ -11,16 +11,34 @@ export function BlogListPage() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [posts, setPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const ITEMS_PER_PAGE = 4;
 
-  const filtered = blogPosts.filter((p) => {
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const res = await fetch("/api/posts");
+        const data = await res.json();
+        setPosts(data.length > 0 ? data : mockPosts);
+      } catch (err) {
+        console.error("Failed to fetch posts:", err);
+        setPosts(mockPosts);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPosts();
+  }, []);
+
+  const filtered = posts.filter((p) => {
     const matchCat = activeCategory === "All" || p.category === activeCategory;
     const matchSearch = p.title.toLowerCase().includes(search.toLowerCase()) ||
       p.excerpt.toLowerCase().includes(search.toLowerCase());
     return matchCat && matchSearch;
   });
 
-  const featured = blogPosts.find((p) => p.featured);
+  const featured = posts.find((p) => p.featured);
   const rest = filtered.filter((p) => !p.featured || activeCategory !== "All" || search);
   const paginated = rest.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
   const totalPages = Math.ceil(rest.length / ITEMS_PER_PAGE);
@@ -121,40 +139,49 @@ export function BlogListPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           {/* Posts */}
           <div className="lg:col-span-2 space-y-8">
-            {paginated.map((post) => (
-              <Link key={post.id} to={`/blog/${post.slug}`} className="group flex flex-col sm:flex-row gap-6 p-6 rounded-2xl bg-white border border-[#FFC5C1]/50 hover:border-[#FF9689]/60 hover:shadow-lg hover:shadow-[#FEAEA7]/20 transition-all duration-300">
-                <div className="w-full sm:w-48 h-48 sm:h-36 rounded-xl overflow-hidden shrink-0">
-                  <ImageWithFallback
-                    src={post.image}
-                    alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                </div>
-                <div className="flex-1 min-w-0 flex flex-col justify-center">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="px-2.5 py-1 rounded-full bg-[#FFC5C1]/20 text-[#FF9689] text-xs font-medium">{post.category}</span>
-                    <span className="text-gray-400 text-xs flex items-center gap-1">
-                      <Clock className="w-3 h-3" /> {post.readTime}
-                    </span>
-                  </div>
-                  <h3 style={SERIF} className="text-gray-900 font-semibold text-xl mb-2 group-hover:text-[#FF9689] transition-colors line-clamp-2">
-                    {post.title}
-                  </h3>
-                  <p className="text-gray-500 text-sm line-clamp-2 mb-4 leading-relaxed">{post.excerpt}</p>
-                  <div className="flex items-center gap-2 text-gray-500 text-xs">
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#FF9689] to-[#FFC6A4] flex items-center justify-center text-white text-[10px] font-semibold">
-                      {post.author.initials}
-                    </div>
-                    <span className="font-medium">{post.author.name}</span> <span className="text-gray-300">·</span> {post.date}
-                  </div>
-                </div>
-              </Link>
-            ))}
-
-            {paginated.length === 0 && (
-              <div className="text-center py-16 bg-white rounded-2xl border border-[#FFC5C1]/30">
-                <p className="text-gray-500">No articles found. Try a different search or category.</p>
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-[#FFC5C1]/30">
+                <Loader2 className="w-10 h-10 text-[#FF9689] animate-spin mb-4" />
+                <p className="text-gray-500 font-medium font-serif">Curating wellness insights...</p>
               </div>
+            ) : (
+              <>
+                {paginated.map((post) => (
+                  <Link key={post.id} to={`/blog/${post.slug}`} className="group flex flex-col sm:flex-row gap-6 p-6 rounded-2xl bg-white border border-[#FFC5C1]/50 hover:border-[#FF9689]/60 hover:shadow-lg hover:shadow-[#FEAEA7]/20 transition-all duration-300">
+                    <div className="w-full sm:w-48 h-48 sm:h-36 rounded-xl overflow-hidden shrink-0">
+                      <ImageWithFallback
+                        src={post.image}
+                        alt={post.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0 flex flex-col justify-center">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="px-2.5 py-1 rounded-full bg-[#FFC5C1]/20 text-[#FF9689] text-xs font-medium">{post.category}</span>
+                        <span className="text-gray-400 text-xs flex items-center gap-1">
+                          <Clock className="w-3 h-3" /> {post.readTime}
+                        </span>
+                      </div>
+                      <h3 style={SERIF} className="text-gray-900 font-semibold text-xl mb-2 group-hover:text-[#FF9689] transition-colors line-clamp-2">
+                        {post.title}
+                      </h3>
+                      <p className="text-gray-500 text-sm line-clamp-2 mb-4 leading-relaxed">{post.excerpt}</p>
+                      <div className="flex items-center gap-2 text-gray-500 text-xs">
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#FF9689] to-[#FFC6A4] flex items-center justify-center text-white text-[10px] font-semibold">
+                          {post.author.initials}
+                        </div>
+                        <span className="font-medium">{post.author.name}</span> <span className="text-gray-300">·</span> {post.date}
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+
+                {paginated.length === 0 && (
+                  <div className="text-center py-16 bg-white rounded-2xl border border-[#FFC5C1]/30">
+                    <p className="text-gray-500">No articles found. Try a different search or category.</p>
+                  </div>
+                )}
+              </>
             )}
 
             {/* Pagination */}
@@ -197,7 +224,7 @@ export function BlogListPage() {
             <div className="p-6 rounded-2xl bg-white border border-[#FFC5C1]/50 shadow-sm shadow-[#FEAEA7]/10">
               <h3 style={SERIF} className="text-gray-900 text-lg font-semibold mb-5">Recent Posts</h3>
               <div className="space-y-5">
-                {blogPosts.slice(0, 4).map((post) => (
+                {posts.slice(0, 4).map((post) => (
                   <Link key={post.id} to={`/blog/${post.slug}`} className="flex gap-4 group">
                     <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0">
                       <ImageWithFallback src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
