@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-import { Check, ChevronRight, Clock, User, Calendar, CreditCard, Sparkles } from "lucide-react";
-import { services, specialists, timeSlots } from "../../data/mockData";
+import { Check, ChevronRight, Clock, User, Calendar, CreditCard, Sparkles, Loader2 } from "lucide-react";
+import { specialists, timeSlots } from "../../data/mockData";
 import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
+import { toast } from "sonner";
 
 const SERIF = { fontFamily: "'Playfair Display', serif" };
 
@@ -16,7 +17,7 @@ const STEPS = [
 
 // Simple calendar
 function MiniCalendar({ selected, onSelect }: { selected: string; onSelect: (d: string) => void }) {
-  const today = new Date(2026, 2, 14);
+  const today = new Date();
   const [month, setMonth] = useState(today.getMonth());
   const [year, setYear] = useState(today.getFullYear());
 
@@ -30,6 +31,7 @@ function MiniCalendar({ selected, onSelect }: { selected: string; onSelect: (d: 
 
   const isDisabled = (d: number) => {
     const date = new Date(year, month, d);
+    date.setHours(23, 59, 59, 999);
     return date < today;
   };
 
@@ -78,8 +80,11 @@ function MiniCalendar({ selected, onSelect }: { selected: string; onSelect: (d: 
 export function BookingPage() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
+  const [dbServices, setDbServices] = useState<any[]>([]);
+  const [loadingServices, setLoadingServices] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [booking, setBooking] = useState({
-    service: null as typeof services[0] | null,
+    service: null as any,
     specialist: null as typeof specialists[0] | null,
     date: "",
     time: "",
@@ -89,6 +94,21 @@ export function BookingPage() {
     notes: "",
   });
 
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const res = await fetch("/api/services");
+        const data = await res.json();
+        setDbServices(data);
+      } catch (err) {
+        toast.error("Failed to load services");
+      } finally {
+        setLoadingServices(false);
+      }
+    };
+    fetchServices();
+  }, []);
+
   const canNext = [
     !!booking.service,
     !!booking.specialist,
@@ -97,15 +117,51 @@ export function BookingPage() {
     true,
   ][step];
 
-  const handleNext = () => {
-    if (step < 4) setStep(step + 1);
-    else {
-      navigate("/booking/success", { state: { booking } });
+  const handleNext = async () => {
+    if (step < 4) {
+      setStep(step + 1);
+    } else {
+      try {
+        setIsSubmitting(true);
+        const res = await fetch("/api/bookings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            guestName: booking.name,
+            guestEmail: booking.email,
+            guestPhone: booking.phone,
+            serviceId: booking.service.id,
+            specialistId: booking.specialist?.id,
+            specialistName: booking.specialist?.name,
+            date: booking.date,
+            time: booking.time,
+            notes: booking.notes,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          if (data.details) {
+            const firstError = Object.values(data.details)[0] as string[];
+            throw new Error(firstError[0] || data.error);
+          }
+          throw new Error(data.error || "Booking failed");
+        }
+
+        navigate("/booking/success", { state: { booking: { ...booking, id: data.id } } });
+      } catch (err: any) {
+        toast.error(err.message || "Failed to confirm booking. Please try again.");
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
   const displayDate = booking.date
-    ? new Date(booking.date + "T12:00:00").toLocaleDateString("en", { weekday: "long", month: "long", day: "numeric", year: "numeric" })
+    ? new Date(booking.date + "T12:00:00").toLocaleDateString("en-US", { 
+        weekday: "long", month: "long", day: "numeric", year: "numeric" 
+      })
     : "";
 
   const inputClass = "w-full bg-pink-50/40 border border-pink-200/60 rounded-xl px-4 py-3 text-gray-800 text-sm placeholder-gray-400 focus:outline-none focus:border-pink-400 focus:bg-white transition-colors";
@@ -160,38 +216,44 @@ export function BookingPage() {
           {step === 0 && (
             <div>
               <h2 style={SERIF} className="text-gray-900 text-2xl font-semibold mb-6">Choose Your Treatment</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {services.map((service) => (
-                  <button
-                    key={service.id}
-                    onClick={() => setBooking({ ...booking, service })}
-                    className={`flex gap-4 p-4 rounded-xl border text-left transition-all ${
-                      booking.service?.id === service.id
+              {loadingServices ? (
+                <div className="flex flex-col items-center justify-center py-20 gap-4">
+                  <Loader2 className="w-8 h-8 text-pink-500 animate-spin" />
+                  <p className="text-gray-400 text-sm">Discovering rituals...</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {dbServices.map((service) => (
+                    <button
+                      key={service.id}
+                      onClick={() => setBooking({ ...booking, service })}
+                      className={`flex gap-4 p-4 rounded-xl border text-left transition-all ${booking.service?.id === service.id
                         ? "border-pink-400 bg-pink-50 shadow-sm shadow-pink-100/60"
                         : "border-pink-100 bg-white hover:border-pink-300 hover:bg-pink-50/40"
-                    }`}
-                  >
-                    <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 border border-pink-100">
-                      <ImageWithFallback src={service.image} alt={service.title} className="w-full h-full object-cover" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-gray-900 text-sm font-medium">{service.title}</p>
-                      <p className="text-gray-400 text-xs mt-0.5">{service.category}</p>
-                      <div className="flex items-center gap-3 mt-2">
-                        <span className="text-gray-400 text-xs flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-pink-300" />{service.duration}
-                        </span>
-                        <span className="text-pink-600 text-sm font-semibold">${service.price}</span>
+                        }`}
+                    >
+                      <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 border border-pink-100">
+                        <ImageWithFallback src={service.imageUrl || service.image} alt={service.name || service.title} className="w-full h-full object-cover" />
                       </div>
-                    </div>
-                    {booking.service?.id === service.id && (
-                      <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#EC4899] to-[#A855F7] flex items-center justify-center shrink-0">
-                        <Check className="w-3 h-3 text-white" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-gray-900 text-sm font-medium">{service.name || service.title}</p>
+                        <p className="text-gray-400 text-xs mt-0.5">{service.category || "Ritual"}</p>
+                        <div className="flex items-center gap-3 mt-2">
+                          <span className="text-gray-400 text-xs flex items-center gap-1">
+                            <Clock className="w-3 h-3 text-pink-300" />{service.duration}{typeof service.duration === 'number' ? ' min' : ''}
+                          </span>
+                          <span className="text-pink-600 text-sm font-semibold">${service.price}</span>
+                        </div>
                       </div>
-                    )}
-                  </button>
-                ))}
-              </div>
+                      {booking.service?.id === service.id && (
+                        <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#EC4899] to-[#A855F7] flex items-center justify-center shrink-0">
+                          <Check className="w-3 h-3 text-white" />
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -296,11 +358,11 @@ export function BookingPage() {
               <h2 style={SERIF} className="text-gray-900 text-2xl font-semibold mb-6">Confirm Your Booking</h2>
               <div className="space-y-4">
                 {[
-                  { label: "Treatment", value: booking.service?.title, sub: booking.service?.category },
+                  { label: "Treatment", value: booking.service?.name || booking.service?.title, sub: booking.service?.category },
                   { label: "Specialist", value: booking.specialist?.name, sub: booking.specialist?.role },
                   { label: "Date", value: displayDate },
                   { label: "Time", value: booking.time },
-                  { label: "Duration", value: booking.service?.duration },
+                  { label: "Duration", value: `${booking.service?.duration}${typeof booking.service?.duration === 'number' ? ' min' : ''}` },
                   { label: "Guest", value: booking.name, sub: booking.email },
                   { label: "Phone", value: booking.phone || "Not provided" },
                 ].map((item, i) => (
@@ -347,11 +409,20 @@ export function BookingPage() {
 
           <button
             onClick={handleNext}
-            disabled={!canNext}
+            disabled={!canNext || isSubmitting}
             className="flex items-center gap-2 px-8 py-3 rounded-full bg-gradient-to-r from-[#EC4899] to-[#A855F7] text-white font-medium hover:opacity-90 hover:shadow-lg hover:shadow-pink-300/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed group"
           >
-            {step === 4 ? "Confirm Booking" : "Continue"}
-            <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                Confirming...
+              </>
+            ) : (
+              <>
+                {step === 4 ? "Confirm Booking" : "Continue"}
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </>
+            )}
           </button>
         </div>
       </div>

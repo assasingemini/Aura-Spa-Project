@@ -64,12 +64,6 @@ export function AdminDashboard() {
           <h1 style={SERIF} className="text-gray-900 text-2xl font-semibold">Dashboard Overview</h1>
           <p className="text-gray-400 text-sm mt-1">{new Date().toLocaleDateString("en", { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
         </div>
-        <Link
-          to="/booking"
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#EC4899] to-[#A855F7] text-white text-sm font-medium hover:opacity-90 hover:shadow-lg hover:shadow-pink-300/30 transition-all"
-        >
-          New Booking <ArrowRight className="w-4 h-4" />
-        </Link>
       </div>
 
       {/* Stat Cards */}
@@ -254,7 +248,6 @@ export function AdminDashboard() {
             <h3 style={SERIF} className="text-gray-900 font-semibold mb-5">Quick Actions</h3>
             <div className="space-y-2">
               {[
-                { label: "New Booking", href: "/booking", gradient: true },
                 { label: "Manage Services", href: "/admin/services", gradient: false },
                 { label: "View Customers", href: "/admin/customers", gradient: false },
                 { label: "Media Library", href: "/admin/media", gradient: false },

@@ -19,6 +19,7 @@ export function LoginPage() {
     await new Promise((r) => setTimeout(r, 1000));
     setLoading(false);
     toast.success("Welcome back to AURA!");
+    localStorage.setItem("user", JSON.stringify({ email: form.email, loggedIn: true }));
     navigate("/admin");
   };
 
