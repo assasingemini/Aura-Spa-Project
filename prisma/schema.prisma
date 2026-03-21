@@ -61,6 +61,9 @@ model Post {
   published Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  category  String   @default("General")
+  readTime  String   @default("5 min read")
+  tags      String[] @default([])
   authorId  String?
   imageUrl  String?
   User      User?    @relation(fields: [authorId], references: [id])

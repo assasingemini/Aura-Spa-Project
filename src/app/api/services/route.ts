@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth";
 
 export async function GET() {
   try {
@@ -15,6 +16,10 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const session = await auth();
+    if (!session || (session.user as any)?.role !== "ADMIN") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
     const data = await request.json();
     const service = await prisma.service.create({
       data: {
@@ -35,6 +40,10 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   try {
+    const session = await auth();
+    if (!session || (session.user as any)?.role !== "ADMIN") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
     const data = await request.json();
     const service = await prisma.service.update({
       where: { id: data.id },
@@ -55,6 +64,10 @@ export async function PUT(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
+    const session = await auth();
+    if (!session || (session.user as any)?.role !== "ADMIN") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
     if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });

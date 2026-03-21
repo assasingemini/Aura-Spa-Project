@@ -30,20 +30,32 @@ export function AdminBookings() {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/bookings");
+      const res = await fetch("/api/bookings", { cache: "no-store" });
+      if (!res.ok) {
+        console.error(`Bookings API failed with status ${res.status}`);
+        setBookings([]);
+        return;
+      }
       const data = await res.json();
-      setBookings(data);
+      if (Array.isArray(data)) {
+        setBookings(data);
+      } else {
+        console.error("Received non-array bookings data:", data);
+        setBookings([]);
+        if (data.error) toast.error(data.error);
+      }
     } catch (error) {
       toast.error("Failed to load bookings");
+      setBookings([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const filtered = bookings.filter((b) => {
-    const matchSearch = b.customer.toLowerCase().includes(search.toLowerCase()) ||
-      b.service.toLowerCase().includes(search.toLowerCase()) ||
-      b.id.toLowerCase().includes(search.toLowerCase());
+  const filtered = (Array.isArray(bookings) ? bookings : []).filter((b) => {
+    const matchSearch = (b.customer || "").toLowerCase().includes(search.toLowerCase()) ||
+      (b.service || "").toLowerCase().includes(search.toLowerCase()) ||
+      (b.id || "").toLowerCase().includes(search.toLowerCase());
     const matchStatus = statusFilter === "All" || b.status === statusFilter;
     return matchSearch && matchStatus;
   });

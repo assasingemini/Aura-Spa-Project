@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { Check, ChevronRight, Clock, User, Calendar, CreditCard, Sparkles } from "lucide-react";
-import { services, specialists, timeSlots } from "../../data/mockData";
+import { services as mockServices, specialists, timeSlots } from "../../data/mockData";
 import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
+import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 
 const SERIF = { fontFamily: "'Playfair Display', serif" };
 
@@ -78,16 +80,54 @@ function MiniCalendar({ selected, onSelect }: { selected: string; onSelect: (d: 
 export function BookingPage() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
+  const [services, setServices] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  
+  const { data: session } = useSession();
   const [booking, setBooking] = useState({
-    service: null as typeof services[0] | null,
+    service: null as any | null,
     specialist: null as typeof specialists[0] | null,
     date: "",
     time: "",
-    name: "",
-    email: "",
+    name: session?.user?.name || "",
+    email: session?.user?.email || "",
     phone: "",
     notes: "",
   });
+
+  useEffect(() => {
+    if (session?.user) {
+      setBooking(prev => ({
+        ...prev,
+        name: prev.name || session.user?.name || "",
+        email: prev.email || session.user?.email || "",
+      }));
+    }
+  }, [session]);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const res = await fetch("/api/services");
+        const data = await res.json();
+        const mapped = data.map((s: any) => ({
+          ...s,
+          title: s.name,
+          image: s.imageUrl,
+          duration: `${s.duration} min`,
+          category: s.category || "Wellness"
+        }));
+        setServices(mapped.length > 0 ? mapped : mockServices);
+      } catch (err) {
+        console.error("Failed to load services:", err);
+        setServices(mockServices);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchServices();
+  }, []);
 
   const canNext = [
     !!booking.service,
@@ -97,10 +137,30 @@ export function BookingPage() {
     true,
   ][step];
 
-  const handleNext = () => {
-    if (step < 4) setStep(step + 1);
-    else {
-      navigate("/booking/success", { state: { booking } });
+  const handleNext = async () => {
+    if (step < 4) {
+      setStep(step + 1);
+    } else {
+      try {
+        setSubmitting(true);
+        const res = await fetch("/api/bookings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...booking,
+            serviceId: booking.service.id,
+          }),
+        });
+
+        if (!res.ok) throw new Error("Failed to book");
+
+        toast.success("Booking confirmed!");
+        navigate("/booking/success", { state: { booking } });
+      } catch (err) {
+        toast.error("Something went wrong. Please try again.");
+      } finally {
+        setSubmitting(false);
+      }
     }
   };
 
@@ -160,38 +220,45 @@ export function BookingPage() {
           {step === 0 && (
             <div>
               <h2 style={SERIF} className="text-gray-900 text-2xl font-semibold mb-6">Choose Your Treatment</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {services.map((service) => (
-                  <button
-                    key={service.id}
-                    onClick={() => setBooking({ ...booking, service })}
-                    className={`flex gap-4 p-4 rounded-xl border text-left transition-all ${
-                      booking.service?.id === service.id
-                        ? "border-pink-400 bg-pink-50 shadow-sm shadow-pink-100/60"
-                        : "border-pink-100 bg-white hover:border-pink-300 hover:bg-pink-50/40"
-                    }`}
-                  >
-                    <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 border border-pink-100">
-                      <ImageWithFallback src={service.image} alt={service.title} className="w-full h-full object-cover" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-gray-900 text-sm font-medium">{service.title}</p>
-                      <p className="text-gray-400 text-xs mt-0.5">{service.category}</p>
-                      <div className="flex items-center gap-3 mt-2">
-                        <span className="text-gray-400 text-xs flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-pink-300" />{service.duration}
-                        </span>
-                        <span className="text-pink-600 text-sm font-semibold">${service.price}</span>
+              {loading ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="w-10 h-10 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin mb-4" />
+                  <p className="text-gray-400 text-sm">Loading services...</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {services.map((service) => (
+                    <button
+                      key={service.id}
+                      onClick={() => setBooking({ ...booking, service })}
+                      className={`flex gap-4 p-4 rounded-xl border text-left transition-all ${
+                        booking.service?.id === service.id
+                          ? "border-pink-400 bg-pink-50 shadow-sm shadow-pink-100/60"
+                          : "border-pink-100 bg-white hover:border-pink-300 hover:bg-pink-50/40"
+                      }`}
+                    >
+                      <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 border border-pink-100">
+                        <ImageWithFallback src={service.image} alt={service.title} className="w-full h-full object-cover" />
                       </div>
-                    </div>
-                    {booking.service?.id === service.id && (
-                      <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#EC4899] to-[#A855F7] flex items-center justify-center shrink-0">
-                        <Check className="w-3 h-3 text-white" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-gray-900 text-sm font-medium">{service.title}</p>
+                        <p className="text-gray-400 text-xs mt-0.5">{service.category}</p>
+                        <div className="flex items-center gap-3 mt-2">
+                          <span className="text-gray-400 text-xs flex items-center gap-1">
+                            <Clock className="w-3 h-3 text-pink-300" />{service.duration}
+                          </span>
+                          <span className="text-pink-600 text-sm font-semibold">${service.price}</span>
+                        </div>
                       </div>
-                    )}
-                  </button>
-                ))}
-              </div>
+                      {booking.service?.id === service.id && (
+                        <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#EC4899] to-[#A855F7] flex items-center justify-center shrink-0">
+                          <Check className="w-3 h-3 text-white" />
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -347,11 +414,17 @@ export function BookingPage() {
 
           <button
             onClick={handleNext}
-            disabled={!canNext}
+            disabled={!canNext || submitting}
             className="flex items-center gap-2 px-8 py-3 rounded-full bg-gradient-to-r from-[#EC4899] to-[#A855F7] text-white font-medium hover:opacity-90 hover:shadow-lg hover:shadow-pink-300/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed group"
           >
-            {step === 4 ? "Confirm Booking" : "Continue"}
-            <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            {submitting ? (
+              <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+            ) : step === 4 ? (
+              "Confirm Booking"
+            ) : (
+              "Continue"
+            )}
+            {!submitting && <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />}
           </button>
         </div>
       </div>

@@ -37,11 +37,25 @@ export function AdminDashboard() {
   useEffect(() => {
     const fetchRecent = async () => {
       try {
-        const res = await fetch("/api/bookings");
+        const res = await fetch("/api/bookings", { cache: "no-store" });
+        if (!res.ok) {
+          console.error(`Bookings API failed with status ${res.status}`);
+          const errData = await res.json().catch(() => ({}));
+          console.error("Error details:", errData);
+          setRecentBookings([]);
+          return;
+        }
         const data = await res.json();
-        setRecentBookings(data.slice(0, 5));
+        if (Array.isArray(data)) {
+          setRecentBookings(data.slice(0, 5));
+        } else {
+          console.error("Received non-array bookings data in dashboard:", data);
+          setRecentBookings([]);
+        }
       } catch (error) {
+        console.error("Dashboard fetch error:", error);
         toast.error("Failed to load dashboard data");
+        setRecentBookings([]);
       } finally {
         setLoading(false);
       }

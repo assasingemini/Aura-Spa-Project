@@ -21,19 +21,31 @@ export function AdminBlog() {
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/posts");
+      const res = await fetch("/api/posts", { cache: "no-store" });
+      if (!res.ok) {
+        console.error(`Posts API failed with status ${res.status}`);
+        setPosts([]);
+        return;
+      }
       const data = await res.json();
-      setPosts(data);
+      if (Array.isArray(data)) {
+        setPosts(data);
+      } else {
+        console.error("Received non-array posts data:", data);
+        setPosts([]);
+        if (data.error) toast.error(data.error);
+      }
     } catch (error) {
       toast.error("Failed to load posts");
+      setPosts([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const filtered = posts.filter((p) =>
-    p.title.toLowerCase().includes(search.toLowerCase()) ||
-    p.category.toLowerCase().includes(search.toLowerCase())
+  const filtered = (Array.isArray(posts) ? posts : []).filter((p) =>
+    (p.title || "").toLowerCase().includes(search.toLowerCase()) ||
+    (p.category || "").toLowerCase().includes(search.toLowerCase())
   );
 
   const openNew = () => {
@@ -47,6 +59,7 @@ export function AdminBlog() {
       date: new Date().toLocaleDateString("en", { month: "long", day: "numeric", year: "numeric" }),
       readTime: "5 min read",
       excerpt: "",
+      content: "",
       featured: false,
       tags: [],
     });
@@ -222,13 +235,39 @@ export function AdminBlog() {
                 </div>
               </div>
               <div>
+                <label className="text-gray-500 text-sm mb-1.5 block">Image URL</label>
+                <div className="flex gap-4 items-start">
+                  <input
+                    value={editPost.image}
+                    onChange={(e) => setEditPost({ ...editPost, image: e.target.value })}
+                    className="flex-1 bg-pink-50/40 border border-pink-200/60 rounded-xl px-4 py-3 text-gray-800 text-sm focus:outline-none focus:border-pink-400 focus:bg-white transition-colors"
+                    placeholder="https://images.unsplash.com/..."
+                  />
+                  {editPost.image && (
+                    <div className="w-12 h-12 rounded-lg overflow-hidden border border-pink-100 shrink-0">
+                      <img src={editPost.image} alt="Preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div>
                 <label className="text-gray-500 text-sm mb-1.5 block">Excerpt</label>
                 <textarea
                   value={editPost.excerpt}
                   onChange={(e) => setEditPost({ ...editPost, excerpt: e.target.value })}
-                  rows={3}
+                  rows={2}
                   className="w-full bg-pink-50/40 border border-pink-200/60 rounded-xl px-4 py-3 text-gray-800 text-sm focus:outline-none focus:border-pink-400 focus:bg-white transition-colors resize-none"
                   placeholder="Brief summary..."
+                />
+              </div>
+              <div>
+                <label className="text-gray-500 text-sm mb-1.5 block">Content (Article Body)</label>
+                <textarea
+                  value={editPost.content || ""}
+                  onChange={(e) => setEditPost({ ...editPost, content: e.target.value })}
+                  rows={6}
+                  className="w-full bg-pink-50/40 border border-pink-200/60 rounded-xl px-4 py-3 text-gray-800 text-sm focus:outline-none focus:border-pink-400 focus:bg-white transition-colors resize-none"
+                  placeholder="Write your article here..."
                 />
               </div>
               <div>

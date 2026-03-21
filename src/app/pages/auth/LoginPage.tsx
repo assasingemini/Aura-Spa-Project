@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { Eye, EyeOff, Sparkles, ArrowRight, Mail, Lock } from "lucide-react";
+import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 import { IMAGES } from "../../data/mockData";
 import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
@@ -16,10 +17,24 @@ export function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setLoading(false);
-    toast.success("Welcome back to AURA!");
-    navigate("/admin");
+    try {
+      const result = await signIn("credentials", {
+        email: form.email,
+        password: form.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        toast.error("Invalid email or password");
+      } else {
+        toast.success("Welcome back to AURA!");
+        navigate("/admin");
+      }
+    } catch (error) {
+      toast.error("Login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -85,7 +100,7 @@ export function LoginPage() {
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder="admin@auraspa.com"
+                  placeholder="admin@auraspa.vn"
                   className="w-full bg-pink-50/40 border border-pink-200/60 rounded-xl pl-11 pr-4 py-3.5 text-gray-800 text-sm placeholder-gray-400 focus:outline-none focus:border-pink-400 focus:bg-white transition-colors"
                 />
               </div>
