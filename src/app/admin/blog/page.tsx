@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminBlogPage() {
   const postsRaw = await prisma.post.findMany({
-    include: { author: true },
+    include: { User: true },
     orderBy: { createdAt: "desc" },
   });
 
@@ -17,7 +17,7 @@ export default async function AdminBlogPage() {
     content: p.content || "",
     imageUrl: p.imageUrl || "",
     published: p.published,
-    authorName: p.author?.name || "Unknown Author",
+    authorName: p.User?.name || "Unknown Author",
     createdAt: p.createdAt.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
   }));
 

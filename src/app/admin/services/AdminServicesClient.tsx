@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition, useRef } from "react";
-import { Plus, Pencil, Trash2, Search, Clock, X, Save, Upload } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, Clock, X, Save, Upload, Image as ImageIcon } from "lucide-react";
 import { ImageWithFallback } from "@/app/components/figma/ImageWithFallback";
 import { toast } from "sonner";
 import { createServiceAction, updateServiceAction, deleteServiceAction } from "./actions";
@@ -154,7 +154,7 @@ export function AdminServicesClient({ initialServices }: { initialServices: Serv
                 <ImageWithFallback src={service.imageUrl} alt={service.name} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-300">
-                  <Image className="w-12 h-12" />
+                  <ImageIcon className="w-12 h-12" />
                 </div>
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />

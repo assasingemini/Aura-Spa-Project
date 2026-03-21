@@ -41,6 +41,7 @@ export function AdminServices() {
           image: s.imageUrl || "",
           category: s.category || "General",
           benefits: [],
+          detailedSteps: [],
           featured: s.published || false,
           shortDescription: (s.description || "").slice(0, 100) + "...",
         }));
@@ -75,6 +76,7 @@ export function AdminServices() {
       shortDescription: "",
       description: "",
       benefits: [],
+      detailedSteps: [],
       featured: false,
     });
     setShowModal(true);
