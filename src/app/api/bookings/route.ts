@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { parse, format, isValid } from "date-fns";
+import { auth } from "@/lib/auth";
 
 // Validation schema for a new booking
 const bookingSchema = z.object({
@@ -18,6 +19,12 @@ const bookingSchema = z.object({
 
 export async function GET() {
   try {
+    const session = await auth();
+
+    if (!session || (session.user as any)?.role !== "ADMIN") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
+
     const bookings = await prisma.booking.findMany({
       include: {
         service: true,
@@ -29,18 +36,18 @@ export async function GET() {
     const transformed = bookings.map(b => ({
       id: b.id,
       customer: b.guestName || b.user?.name || "Unknown",
-      service: b.service.name,
+      service: b.service?.name || "Unknown Service",
       specialist: b.specialistName || "Assigned",
       date: format(b.appointmentDate, "PPP"),
       time: format(b.appointmentDate, "p"),
       status: b.status.toLowerCase(),
-      amount: b.service.price,
+      amount: b.service?.price || 0,
     }));
 
     return NextResponse.json(transformed);
   } catch (error) {
     console.error("Fetch bookings error:", error);
-    return NextResponse.json({ error: "Could not retrieve bookings" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch bookings" }, { status: 500 });
   }
 }
 
@@ -60,7 +67,6 @@ export async function POST(request: Request) {
     const { date, time, ...rest } = validation.data;
 
     // Robust Date Construction using date-fns
-    // Input format: date="2026-03-21", time="09:00 AM"
     const dateTimeStr = `${date} ${time}`;
     const appointmentDate = parse(dateTimeStr, "yyyy-MM-dd hh:mm a", new Date());
 
@@ -87,6 +93,11 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
+    const session = await auth();
+    if (!session || (session.user as any)?.role !== "ADMIN") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
+
     const { id, status } = await request.json();
     if (!id || !status) return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
 
@@ -100,3 +111,4 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Failed to update status" }, { status: 500 });
   }
 }
+

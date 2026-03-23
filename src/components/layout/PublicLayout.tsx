@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import { toast } from "sonner";
 import { Menu, X, Sparkles, Instagram, Facebook, Twitter, Youtube, Mail, Phone, MapPin, ChevronRight, Heart } from "lucide-react";
 
@@ -19,16 +20,12 @@ export function Navbar() {
     const [mobileOpen, setMobileOpen] = useState(false);
     const pathname = usePathname();
     const router = useRouter();
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    
+    const { data: session } = useSession();
+    const isLoggedIn = !!session;
 
-    useEffect(() => {
-        const user = localStorage.getItem("user");
-        setIsLoggedIn(!!user);
-    }, [pathname]);
-
-    const handleLogout = () => {
-        localStorage.removeItem("user");
-        setIsLoggedIn(false);
+    const handleLogout = async () => {
+        await signOut({ redirect: false });
         toast.success("Signed out successfully");
         router.push("/");
     };

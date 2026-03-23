@@ -265,6 +265,7 @@ export interface BlogPost {
   date: string;
   readTime: string;
   excerpt: string;
+  content: string;
   featured: boolean;
   tags: string[];
 }
@@ -280,6 +281,7 @@ export const blogPosts: BlogPost[] = [
     date: "March 8, 2026",
     readTime: "8 min read",
     excerpt: "Discover the science behind deep skin hydration and how our signature treatments restore your skin's natural luminosity and youthful glow.",
+    content: "The journey to radiant, healthy skin begins with understanding the fundamental principles of skincare. At AURA, we believe that every person deserves to feel confident in their skin — and our treatments are designed with exactly that goal in mind.",
     featured: true,
     tags: ["Skincare", "Hydration", "Facial Treatments", "Anti-Aging"],
   },
@@ -293,6 +295,7 @@ export const blogPosts: BlogPost[] = [
     date: "March 1, 2026",
     readTime: "6 min read",
     excerpt: "Explore how ancient aromatherapy traditions combined with modern science can profoundly transform your mental and physical wellbeing.",
+    content: "Immerse yourself in the healing power of pure essential oils in this deeply restorative ritual. Our therapists curate a bespoke blend tailored to your emotional and physical needs, delivering profound relaxation through aromatherapy massage, steam therapy, and mindful breathing techniques.",
     featured: false,
     tags: ["Aromatherapy", "Essential Oils", "Wellness", "Stress Relief"],
   },
@@ -306,6 +309,7 @@ export const blogPosts: BlogPost[] = [
     date: "February 22, 2026",
     readTime: "5 min read",
     excerpt: "Learn how volcanic basalt stones heated to precise temperatures unlock deep muscular tension that no hands alone can reach.",
+    content: "Surrender to the therapeutic warmth of smooth basalt stones expertly placed and glided across tense muscles. This time-honored ritual melts away stress, improves circulation, and restores deep muscular balance.",
     featured: false,
     tags: ["Hot Stone", "Massage", "Healing", "Relaxation"],
   },
@@ -319,6 +323,7 @@ export const blogPosts: BlogPost[] = [
     date: "February 15, 2026",
     readTime: "7 min read",
     excerpt: "In today's demanding world, luxury self-care isn't an indulgence — it's a necessity. Discover how to build a sustainable spa ritual into your lifestyle.",
+    content: "At AURA, we define luxury by the quality of attention given to oneself. Our rituals are more than just treatments; they are a commitment to your long-term wellbeing and mental clarity.",
     featured: false,
     tags: ["Self-Care", "Lifestyle", "Wellness", "Luxury"],
   },
@@ -332,6 +337,7 @@ export const blogPosts: BlogPost[] = [
     date: "February 8, 2026",
     readTime: "10 min read",
     excerpt: "Uncover the clinical research and premium ingredients that make our Anti-Aging Facial one of the most effective treatments available today.",
+    content: "Modern skincare science has made remarkable advances in recent years. What was once considered impossible — reversing signs of aging, restoring deep hydration — is now achievable with the right combination of active ingredients.",
     featured: false,
     tags: ["Anti-Aging", "Science", "Skincare", "Clinical"],
   },
@@ -345,6 +351,7 @@ export const blogPosts: BlogPost[] = [
     date: "January 30, 2026",
     readTime: "6 min read",
     excerpt: "From mineral-rich seaweed wraps to warming clay therapies — a deep dive into how body wraps purify, tone, and transform your skin.",
+    content: "Our signature Body Wrap Therapy is a full-body transformation ritual. We begin with a full-body exfoliation using our mineral-rich scrub, followed by application of our proprietary detoxifying wrap.",
     featured: false,
     tags: ["Body Wrap", "Detox", "Body Treatments", "Skin Toning"],
   },

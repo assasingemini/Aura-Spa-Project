@@ -21,31 +21,46 @@ export function AdminServices() {
   const fetchServices = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/services");
+      const res = await fetch("/api/services", { cache: "no-store" });
+      if (!res.ok) {
+        console.error(`Services API failed with status ${res.status}`);
+        setServices([]);
+        return;
+      }
       const data = await res.json();
-      // Map Prisma model to UI Service type
-      const mapped = data.map((s: any) => ({
-        id: s.id,
-        title: s.name,
-        description: s.description,
-        price: s.price,
-        duration: `${s.duration} min`,
-        image: s.imageUrl || "",
-        category: "General", // Placeholder
-        featured: false,
-        shortDescription: s.description.slice(0, 100) + "...",
-      }));
-      setServices(mapped);
+      
+      if (Array.isArray(data)) {
+        // Map Prisma model to UI Service type
+        const mapped = data.map((s: any) => ({
+          id: s.id,
+          slug: s.slug || "",
+          title: s.name,
+          description: s.description,
+          price: s.price,
+          duration: `${s.duration} min`,
+          image: s.imageUrl || "",
+          category: s.category || "General",
+          benefits: [],
+          featured: s.published || false,
+          shortDescription: (s.description || "").slice(0, 100) + "...",
+        }));
+        setServices(mapped);
+      } else {
+        console.error("Received non-array services data:", data);
+        setServices([]);
+        if (data.error) toast.error(data.error);
+      }
     } catch (error) {
       toast.error("Failed to load services");
+      setServices([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const filtered = services.filter((s) =>
-    s.title.toLowerCase().includes(search.toLowerCase()) ||
-    s.category.toLowerCase().includes(search.toLowerCase())
+  const filtered = (Array.isArray(services) ? services : []).filter((s) =>
+    (s.title || "").toLowerCase().includes(search.toLowerCase()) ||
+    (s.category || "").toLowerCase().includes(search.toLowerCase())
   );
 
   const openNew = () => {
