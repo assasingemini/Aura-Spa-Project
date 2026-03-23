@@ -15,7 +15,7 @@ export default function App() {
   if (!router) return null;
 
   return (
-    <>
+    <div id="app-router-root">
       <RouterProvider router={router} />
       <Toaster
         position="top-right"
@@ -27,6 +27,6 @@ export default function App() {
           },
         }}
       />
-    </>
+    </div>
   );
 }
