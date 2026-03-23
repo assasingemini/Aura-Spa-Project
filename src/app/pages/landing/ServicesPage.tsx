@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router";
-import { ArrowRight, Clock, Star, Filter, CheckCircle, Sparkles, X } from "lucide-react";
-import { services, IMAGES } from "../../data/mockData";
+import { ArrowRight, Clock, Star, Filter, CheckCircle, Sparkles, X, Loader2 } from "lucide-react";
+import { services as mockServices, IMAGES, Service } from "../../data/mockData";
 import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
 
 const SERIF = { fontFamily: "'Playfair Display', serif" };
@@ -10,9 +10,50 @@ const CATEGORIES = ["All", "Facial Treatments", "Massage Therapy", "Body Treatme
 
 export function ServicesPage() {
   const [activeCategory, setActiveCategory] = useState("All");
-  const [selectedService, setSelectedService] = useState<typeof services[0] | null>(null);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filtered = activeCategory === "All" ? services : services.filter((s) => s.category === activeCategory);
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch("/api/services");
+        if (!response.ok) throw new Error("Failed to fetch services");
+        const data = await response.json();
+        
+        // Transform API data to match UI expectations if necessary
+        const transformedData = data.map((s: any) => ({
+          ...s,
+          id: s.id,
+          title: s.name, // API uses 'name', UI uses 'title'
+          image: s.imageUrl || IMAGES.pool,
+          duration: typeof s.duration === 'number' ? `${s.duration} min` : s.duration,
+          benefits: s.benefits || ["Professional care", "Expert techniques"],
+          shortDescription: s.description?.slice(0, 100) + "..." || "",
+          category: s.category || "Facial Treatments", // Default category if missing
+        }));
+        
+        setServices(transformedData.length > 0 ? transformedData : mockServices);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching services:", err);
+        setError("Could not load services. Using offline data.");
+        setServices(mockServices); // Fallback to mock data on error
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchServices();
+  }, []);
+
+  const filtered = useMemo(() => {
+    return activeCategory === "All"
+      ? services
+      : services.filter((s) => s.category === activeCategory);
+  }, [services, activeCategory]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50/60 via-pink-50/30 to-white pt-24">
@@ -64,69 +105,86 @@ export function ServicesPage() {
       </section>
 
       {/* Services Grid */}
-      <section className="py-16 max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filtered.map((service) => (
-            <div
-              key={service.id}
-              className="group rounded-2xl overflow-hidden bg-white border border-pink-100 hover:border-pink-300/60 hover:shadow-xl hover:shadow-pink-100/50 transition-all duration-400 cursor-pointer"
-              onClick={() => setSelectedService(service)}
+      <section className="py-16 max-w-7xl mx-auto px-6 min-h-[400px]">
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20 animate-in fade-in duration-700">
+            <Loader2 className="w-10 h-10 text-pink-400 animate-spin mb-4" />
+            <p className="text-gray-400 font-medium">Elevating your experience...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-20 bg-pink-50/30 rounded-3xl border border-pink-100/50">
+            <p className="text-pink-600 font-medium mb-4">{error}</p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="px-6 py-2 bg-white border border-pink-200 text-pink-600 rounded-full hover:bg-pink-50 transition-colors"
             >
-              <div className="aspect-video relative overflow-hidden">
-                <ImageWithFallback
-                  src={service.image}
-                  alt={service.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                <span className="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#EC4899]/90 to-[#A855F7]/90 text-white text-xs backdrop-blur-sm">
-                  {service.category}
-                </span>
-                {service.featured && (
-                  <span className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-white/90 border border-pink-200 text-pink-600 text-xs backdrop-blur-sm">
-                    Featured ✨
+              Try Again
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {filtered.map((service) => (
+              <div
+                key={service.id}
+                className="group rounded-2xl overflow-hidden bg-white border border-pink-100 hover:border-pink-300/60 hover:shadow-xl hover:shadow-pink-100/50 transition-all duration-400 cursor-pointer"
+                onClick={() => setSelectedService(service)}
+              >
+                <div className="aspect-video relative overflow-hidden">
+                  <ImageWithFallback
+                    src={service.image}
+                    alt={service.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                  <span className="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#EC4899]/90 to-[#A855F7]/90 text-white text-xs backdrop-blur-sm">
+                    {service.category}
                   </span>
-                )}
-              </div>
-
-              <div className="p-6">
-                <h3 style={SERIF} className="text-gray-900 text-2xl font-semibold mb-2">{service.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-2">{service.shortDescription}</p>
-
-                <div className="flex flex-wrap gap-2 mb-5">
-                  {service.benefits.slice(0, 3).map((b) => (
-                    <span key={b} className="flex items-center gap-1 text-gray-500 text-xs">
-                      <CheckCircle className="w-3 h-3 text-[#EC4899]" /> {b}
+                  {service.featured && (
+                    <span className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-white/90 border border-pink-200 text-pink-600 text-xs backdrop-blur-sm">
+                      Featured ✨
                     </span>
-                  ))}
+                  )}
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-pink-100">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1.5">
-                      <Clock className="w-4 h-4 text-pink-300" />
-                      <span className="text-gray-500 text-sm">{service.duration}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Star className="w-3.5 h-3.5 fill-[#EC4899] text-[#EC4899]" />
-                      <span className="text-gray-500 text-sm">4.9</span>
-                    </div>
+                <div className="p-6">
+                  <h3 style={SERIF} className="text-gray-900 text-2xl font-semibold mb-2">{service.title}</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-2">{service.shortDescription}</p>
+
+                  <div className="flex flex-wrap gap-2 mb-5">
+                    {service.benefits.slice(0, 3).map((b) => (
+                      <span key={b} className="flex items-center gap-1 text-gray-500 text-xs">
+                        <CheckCircle className="w-3 h-3 text-[#EC4899]" /> {b}
+                      </span>
+                    ))}
                   </div>
-                  <span style={SERIF} className="text-gray-900 text-xl font-semibold">${service.price}</span>
-                </div>
 
-                <Link
-                  to="/booking"
-                  onClick={(e) => e.stopPropagation()}
-                  className="mt-5 w-full flex items-center justify-center gap-2 py-3 rounded-full bg-gradient-to-r from-[#EC4899] to-[#A855F7] text-white text-sm font-medium hover:opacity-90 hover:shadow-lg hover:shadow-pink-300/30 transition-all group"
-                >
-                  Book This Treatment
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
+                  <div className="flex items-center justify-between pt-4 border-t border-pink-100">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="w-4 h-4 text-pink-300" />
+                        <span className="text-gray-500 text-sm">{service.duration}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Star className="w-3.5 h-3.5 fill-[#EC4899] text-[#EC4899]" />
+                        <span className="text-gray-500 text-sm">4.9</span>
+                      </div>
+                    </div>
+                    <span style={SERIF} className="text-gray-900 text-xl font-semibold">${service.price}</span>
+                  </div>
+
+                  <Link
+                    to="/booking"
+                    onClick={(e) => e.stopPropagation()}
+                    className="mt-5 w-full flex items-center justify-center gap-2 py-3 rounded-full bg-gradient-to-r from-[#EC4899] to-[#A855F7] text-white text-sm font-medium hover:opacity-90 hover:shadow-lg hover:shadow-pink-300/30 transition-all group"
+                  >
+                    Book This Treatment
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Detail Modal */}

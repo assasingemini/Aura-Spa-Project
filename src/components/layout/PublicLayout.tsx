@@ -1,14 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { 
-    Menu, X, Sparkles, Instagram, Facebook, Twitter, Youtube, 
-    Mail, Phone, MapPin, ChevronRight, Heart, 
-    LogOut, User as UserIcon, LayoutDashboard 
-} from "lucide-react";
+import { toast } from "sonner";
+import { Menu, X, Sparkles, Instagram, Facebook, Twitter, Youtube, Mail, Phone, MapPin, ChevronRight, Heart } from "lucide-react";
 
 const NAV_LINKS = [
     { label: "Home", href: "/" },
@@ -20,13 +16,19 @@ const NAV_LINKS = [
 ];
 
 export function Navbar() {
-    const { data: session } = useSession();
     const [scrolled, setScrolled] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
     const pathname = usePathname();
+    const router = useRouter();
+    
+    const { data: session } = useSession();
+    const isLoggedIn = !!session;
 
-    const user = session?.user as any;
-    const isAdmin = user?.role === "ADMIN";
+    const handleLogout = async () => {
+        await signOut({ redirect: false });
+        toast.success("Signed out successfully");
+        router.push("/");
+    };
 
     useEffect(() => {
         const handler = () => setScrolled(window.scrollY > 60);
@@ -39,6 +41,11 @@ export function Navbar() {
         window.scrollTo(0, 0);
     }, [pathname]);
 
+    // Hide Navbar on admin pages
+    if (pathname?.startsWith("/admin")) return null;
+
+    const isLoginPage = pathname === "/login";
+
     return (
         <nav
             className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
@@ -48,19 +55,19 @@ export function Navbar() {
         >
             <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2 group">
+                <a href="/" className="flex items-center gap-2 group">
                     <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#FF9689] to-[#FFC6A4] flex items-center justify-center shadow-lg shadow-[#FF9689]/40 group-hover:shadow-[#FF9689]/60 transition-all">
                         <Sparkles className="w-5 h-5 text-white" />
                     </div>
                     <span style={{ fontFamily: "'Playfair Display', serif" }} className="text-xl font-semibold tracking-wide text-gray-900">
                         AURA
                     </span>
-                </Link>
+                </a>
 
                 {/* Desktop Nav */}
                 <div className="hidden lg:flex items-center gap-8">
                     {NAV_LINKS.map((link) => (
-                        <Link
+                        <a
                             key={link.href}
                             href={link.href}
                             className={`text-sm transition-all duration-200 relative group ${pathname === link.href ? "text-[#FF9689] font-medium" : "text-gray-600 hover:text-[#FF9689]"
@@ -71,47 +78,40 @@ export function Navbar() {
                                 className={`absolute -bottom-1 left-0 h-px bg-gradient-to-r from-[#FF9689] to-[#FFC6A4] transition-all duration-300 ${pathname === link.href ? "w-full" : "w-0 group-hover:w-full"
                                     }`}
                             />
-                        </Link>
+                        </a>
                     ))}
-                    {isAdmin && (
-                        <Link href="/admin" className="text-sm text-[#FF9689] font-medium flex items-center gap-1.5 hover:opacity-80 transition-opacity">
-                            <LayoutDashboard className="w-4 h-4" />
-                            Admin Panel
-                        </Link>
-                    )}
                 </div>
 
-                {/* CTA / Auth */}
+                {/* CTA */}
                 <div className="hidden lg:flex items-center gap-4">
-                    {session ? (
-                        <div className="flex items-center gap-4 pl-4 border-l border-[#FEAEA7]/40">
-                            <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#FF9689] to-[#FFC6A4] flex items-center justify-center text-white text-xs font-semibold">
-                                    {user?.name?.[0] || <UserIcon className="w-4 h-4" />}
-                                </div>
-                                <span className="text-sm text-gray-700 font-medium">{user?.name}</span>
-                            </div>
-                            <button
-                                onClick={() => signOut()}
-                                className="p-2 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
-                                title="Sign Out"
-                            >
-                                <LogOut className="w-4 h-4" />
-                            </button>
-                        </div>
-                    ) : (
+                    {isLoggedIn ? (
                         <>
-                            <Link href="/login" className="text-sm text-gray-500 hover:text-[#FF9689] transition-colors">
+                            <button
+                                onClick={handleLogout}
+                                className="text-sm text-gray-500 hover:text-[#FF9689] transition-colors"
+                            >
+                                Sign Out
+                            </button>
+                            <a
+                                href="/admin"
+                                className="px-5 py-2.5 rounded-full bg-gradient-to-r from-[#FF9689] to-[#FFC6A4] text-white text-sm font-medium hover:opacity-90 hover:shadow-lg hover:shadow-[#FF9689]/40 transition-all duration-300"
+                            >
+                                Admin
+                            </a>
+                        </>
+                    ) : !isLoginPage ? (
+                        <>
+                            <a href="/login" className="text-sm text-gray-500 hover:text-[#FF9689] transition-colors">
                                 Sign In
-                            </Link>
-                            <Link
+                            </a>
+                            <a
                                 href="/booking"
                                 className="px-5 py-2.5 rounded-full bg-gradient-to-r from-[#FF9689] to-[#FFC6A4] text-white text-sm font-medium hover:opacity-90 hover:shadow-lg hover:shadow-[#FF9689]/40 transition-all duration-300"
                             >
                                 Book Now
-                            </Link>
+                            </a>
                         </>
-                    )}
+                    ) : null}
                 </div>
 
                 {/* Mobile toggle */}
@@ -127,50 +127,37 @@ export function Navbar() {
             {mobileOpen && (
                 <div className="lg:hidden bg-white/98 backdrop-blur-xl border-t border-[#FEAEA7] px-6 py-6 space-y-4">
                     {NAV_LINKS.map((link) => (
-                        <Link
+                        <a
                             key={link.href}
                             href={link.href}
                             className={`block text-base py-2 transition-colors ${pathname === link.href ? "text-[#FF9689] font-medium" : "text-gray-600 hover:text-[#FF9689]"
                                 }`}
                         >
                             {link.label}
-                        </Link>
+                        </a>
                     ))}
-                    {isAdmin && (
-                        <Link href="/admin" className="block text-base py-2 text-[#FF9689] font-medium border-t border-[#FEAEA7]/40 pt-4">
-                            Admin Panel
-                        </Link>
-                    )}
                     <div className="pt-4 flex flex-col gap-3 border-t border-[#FEAEA7]">
-                        {session ? (
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-3 px-2 py-1">
-                                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF9689] to-[#FFC6A4] flex items-center justify-center text-white font-semibold">
-                                        {user?.name?.[0]}
-                                    </div>
-                                    <div className="flex-1">
-                                        <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                                        <p className="text-xs text-gray-500">{user?.email}</p>
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={() => signOut()}
-                                    className="w-full flex items-center justify-center gap-2 py-3 rounded-full border border-red-100 text-red-500 text-sm font-medium hover:bg-red-50 transition-all"
-                                >
-                                    <LogOut className="w-4 h-4" /> Sign Out
-                                </button>
-                            </div>
-                        ) : (
+                        {isLoggedIn ? (
                             <>
-                                <Link href="/login" className="text-gray-500 text-sm hover:text-[#FF9689] py-2">Sign In</Link>
-                                <Link
+                                <button onClick={handleLogout} className="text-gray-500 text-sm hover:text-[#FF9689] py-2 text-left">Sign Out</button>
+                                <a
+                                    href="/admin"
+                                    className="text-center py-3 rounded-full bg-gradient-to-r from-[#FF9689] to-[#FFC6A4] text-white text-sm font-medium"
+                                >
+                                    Admin
+                                </a>
+                            </>
+                        ) : !isLoginPage ? (
+                            <>
+                                <a href="/login" className="text-gray-500 text-sm hover:text-[#FF9689] py-2">Sign In</a>
+                                <a
                                     href="/booking"
                                     className="text-center py-3 rounded-full bg-gradient-to-r from-[#FF9689] to-[#FFC6A4] text-white text-sm font-medium"
                                 >
                                     Book Appointment
-                                </Link>
+                                </a>
                             </>
-                        )}
+                        ) : null}
                     </div>
                 </div>
             )}
@@ -179,18 +166,21 @@ export function Navbar() {
 }
 
 export function Footer() {
+    const pathname = usePathname();
+    if (pathname?.startsWith("/admin")) return null;
+
     return (
         <footer className="bg-gradient-to-br from-[#FFD6BE]/10 via-white to-[#FEAEA7]/10 border-t border-[#FEAEA7]/30 pt-20 pb-10">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
                     {/* Brand */}
                     <div className="lg:col-span-1">
-                        <Link href="/" className="flex items-center gap-2 mb-6 group">
+                        <a href="/" className="flex items-center gap-2 mb-6 group">
                             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#FF9689] to-[#FFC6A4] flex items-center justify-center shadow-lg shadow-[#FF9689]/40 group-hover:shadow-[#FF9689]/60 transition-all">
                                 <Sparkles className="w-5 h-5 text-white" />
                             </div>
                             <span style={{ fontFamily: "'Playfair Display', serif" }} className="text-xl font-semibold text-gray-900">AURA</span>
-                        </Link>
+                        </a>
                         <p className="text-gray-500 text-sm leading-relaxed mb-6">
                             Where luxury meets wellness. Experience the art of beauty and relaxation in a sanctuary crafted for the discerning.
                         </p>
@@ -209,10 +199,10 @@ export function Footer() {
                         <ul className="space-y-3">
                             {NAV_LINKS.map((link) => (
                                 <li key={link.href}>
-                                    <Link href={link.href} className="text-gray-500 text-sm hover:text-[#FF9689] transition-colors flex items-center gap-2 group">
+                                    <a href={link.href} className="text-gray-500 text-sm hover:text-[#FF9689] transition-colors flex items-center gap-2 group">
                                         <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0 text-[#FF9689]" />
                                         {link.label}
-                                    </Link>
+                                    </a>
                                 </li>
                             ))}
                         </ul>
@@ -224,10 +214,10 @@ export function Footer() {
                         <ul className="space-y-3">
                             {["Signature Facial", "Hot Stone Massage", "Aromatherapy Ritual", "Body Wrap Therapy", "Anti-Aging Facial", "Hydrotherapy Pool"].map((s) => (
                                 <li key={s}>
-                                    <Link href="/services" className="text-gray-500 text-sm hover:text-[#FF9689] transition-colors flex items-center gap-2 group">
+                                    <a href="/services" className="text-gray-500 text-sm hover:text-[#FF9689] transition-colors flex items-center gap-2 group">
                                         <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0 text-[#FF9689]" />
                                         {s}
-                                    </Link>
+                                    </a>
                                 </li>
                             ))}
                         </ul>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Outlet, Link, useLocation, useNavigate } from "react-router";
+import { toast } from "sonner";
 import {
   LayoutDashboard, Scissors, BookOpen, CalendarDays, Users,
   Image, Settings, Sparkles, Menu, X, Bell, Search,
@@ -25,6 +26,12 @@ export function AdminLayout() {
   const isActive = (href: string) => {
     if (href === "/admin") return location.pathname === "/admin";
     return location.pathname.startsWith(href);
+  };
+
+  const handleSignOut = () => {
+    localStorage.removeItem("user");
+    toast.success("Signed out successfully");
+    navigate("/");
   };
 
   const SidebarContent = () => (
@@ -79,13 +86,13 @@ export function AdminLayout() {
           <TrendingUp className="w-5 h-5 shrink-0" />
           {sidebarOpen && <span className="text-sm">View Website</span>}
         </Link>
-        <Link
-          to="/login"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
+        <button
+          onClick={handleSignOut}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all text-left"
         >
           <LogOut className="w-5 h-5 shrink-0" />
-          {sidebarOpen && <span className="text-sm">Sign Out</span>}
-        </Link>
+          {sidebarOpen && <span className="text-sm font-medium">Sign Out</span>}
+        </button>
       </div>
     </div>
   );

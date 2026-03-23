@@ -1,13 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
 import {
   ArrowRight, Star, CheckCircle, Play, ChevronLeft, ChevronRight,
-  Sparkles, Wind, Droplets, Zap, Heart, Clock, Award, Users
+  Sparkles, Wind, Droplets, Zap, Heart, Clock, Award, Users, Loader2
 } from "lucide-react";
-import { services, specialists, testimonials, blogPosts, pricingPackages, IMAGES } from "../../data/mockData";
+import { services as mockServices, specialists, testimonials, blogPosts as mockBlogPosts, pricingPackages, IMAGES, Service, BlogPost } from "../../data/mockData";
 import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
 
 const SERIF = { fontFamily: "'Playfair Display', serif" };
@@ -139,7 +139,36 @@ function HeroSection() {
 
 // ── Featured Treatments (Vertical Layout) ────────────────────────────────────
 function FeaturedTreatments() {
-  const featured = services.filter((s) => s.featured).slice(0, 4);
+  const [featured, setFeatured] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      try {
+        const response = await fetch("/api/services");
+        if (!response.ok) throw new Error("Failed");
+        const data = await response.json();
+        const transformed = data.map((s: any) => ({
+          ...s,
+          id: s.id,
+          title: s.name,
+          image: s.imageUrl || IMAGES.pool,
+          duration: typeof s.duration === 'number' ? `${s.duration} min` : s.duration,
+          benefits: s.benefits || ["Professional care"],
+          shortDescription: s.description?.slice(0, 100) + "..." || "",
+          category: s.category || "Treatments",
+        })).filter((s: Service) => s.featured).slice(0, 4);
+        
+        setFeatured(transformed.length > 0 ? transformed : mockServices.filter(s => s.featured).slice(0, 4));
+      } catch (err) {
+        setFeatured(mockServices.filter(s => s.featured).slice(0, 4));
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFeatured();
+  }, []);
+
   return (
     <section className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-6">
@@ -154,35 +183,42 @@ function FeaturedTreatments() {
         </div>
 
         <div className="flex flex-col gap-8">
-          {featured.map((service, i) => (
-            <div
-              key={service.id}
-              className="group relative rounded-2xl overflow-hidden cursor-pointer border border-[#FFC5C1]/50 hover:border-[#FF9689]/60 hover:shadow-xl hover:shadow-[#FEAEA7]/30 transition-all duration-500 flex flex-col md:flex-row bg-white"
-            >
-              <div className="w-full md:w-[45%] lg:w-1/2 aspect-video md:aspect-auto relative overflow-hidden">
-                <ImageWithFallback
-                  src={service.image}
-                  alt={service.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 md:absolute md:inset-0"
-                />
-              </div>
-              <div className="w-full md:w-[55%] lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center bg-white">
-                <span className="text-[#FF9689] text-sm uppercase tracking-wider font-semibold">{service.category}</span>
-                <h3 style={SERIF} className="text-gray-900 text-3xl font-semibold mt-3 mb-4 group-hover:text-[#FF9689] transition-colors">{service.title}</h3>
-                <p className="text-gray-500 text-base mb-6 leading-relaxed">{service.description}</p>
-                <div className="flex items-center justify-between mb-8 pb-6 border-b border-[#FEAEA7]/30">
-                  <span className="text-gray-600 font-medium flex items-center gap-2"><Clock className="w-4 h-4 text-[#FF9689]"/> {service.duration}</span>
-                  <span className="text-gray-900 font-bold text-2xl">${service.price}</span>
-                </div>
-                <Link
-                  to="/booking"
-                  className="inline-flex items-center gap-2 text-[#FF9689] text-base group-hover:gap-3 transition-all font-medium self-start bg-[#FFC5C1]/20 px-6 py-3 rounded-full hover:bg-[#FF9689] hover:text-white"
-                >
-                  Book Appointment <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
+          {loading ? (
+            <div className="flex flex-col items-center py-20">
+              <Loader2 className="w-8 h-8 text-[#FF9689] animate-spin mb-3" />
+              <p className="text-gray-400 text-sm italic">Curating your experience...</p>
             </div>
-          ))}
+          ) : (
+            featured.map((service, i) => (
+              <div
+                key={service.id}
+                className="group relative rounded-2xl overflow-hidden cursor-pointer border border-[#FFC5C1]/50 hover:border-[#FF9689]/60 hover:shadow-xl hover:shadow-[#FEAEA7]/30 transition-all duration-500 flex flex-col md:flex-row bg-white"
+              >
+                <div className="w-full md:w-[45%] lg:w-1/2 aspect-video md:aspect-auto relative overflow-hidden">
+                  <ImageWithFallback
+                    src={service.image}
+                    alt={service.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 md:absolute md:inset-0"
+                  />
+                </div>
+                <div className="w-full md:w-[55%] lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center bg-white">
+                  <span className="text-[#FF9689] text-sm uppercase tracking-wider font-semibold">{service.category}</span>
+                  <h3 style={SERIF} className="text-gray-900 text-3xl font-semibold mt-3 mb-4 group-hover:text-[#FF9689] transition-colors">{service.title}</h3>
+                  <p className="text-gray-500 text-base mb-6 leading-relaxed">{service.description}</p>
+                  <div className="flex items-center justify-between mb-8 pb-6 border-b border-[#FEAEA7]/30">
+                    <span className="text-gray-600 font-medium flex items-center gap-2"><Clock className="w-4 h-4 text-[#FF9689]"/> {service.duration}</span>
+                    <span className="text-gray-900 font-bold text-2xl">${service.price}</span>
+                  </div>
+                  <Link
+                    to="/booking"
+                    className="inline-flex items-center gap-2 text-[#FF9689] text-base group-hover:gap-3 transition-all font-medium self-start bg-[#FFC5C1]/20 px-6 py-3 rounded-full hover:bg-[#FF9689] hover:text-white"
+                  >
+                    Book Appointment <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              </div>
+            ))
+          )}
         </div>
 
         <div className="text-center mt-12">
@@ -543,7 +579,25 @@ function PricingSection() {
 
 // ─ Blog Preview ──────────────────────────────────────────────────────────────
 function BlogPreview() {
-  const recent = blogPosts.slice(0, 3);
+  const [recent, setRecent] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRecent = async () => {
+      try {
+        const response = await fetch("/api/posts");
+        if (!response.ok) throw new Error("Failed");
+        const data = await response.json();
+        setRecent(data.length > 0 ? data.slice(0, 3) : mockBlogPosts.slice(0, 3));
+      } catch (err) {
+        setRecent(mockBlogPosts.slice(0, 3));
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRecent();
+  }, []);
+
   return (
     <section className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-6">
@@ -559,37 +613,44 @@ function BlogPreview() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {recent.map((post) => (
-            <Link key={post.id} to={`/blog/${post.slug}`} className="group">
-              <div className="aspect-video rounded-2xl overflow-hidden mb-5 border border-[#FFC5C1]/50">
-                <ImageWithFallback
-                  src={post.image}
-                  alt={post.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-              </div>
-              <div className="flex items-center gap-3 mb-3">
-                <span className="px-3 py-1 rounded-full bg-[#FFC5C1]/20 border border-[#FEAEA7]/50 text-[#FF9689] text-xs">
-                  {post.category}
-                </span>
-                <span className="text-gray-400 text-xs">{post.readTime}</span>
-              </div>
-              <h3 style={SERIF} className="text-gray-900 text-xl font-semibold mb-2 group-hover:text-[#FF9689] transition-colors leading-snug">
-                {post.title}
-              </h3>
-              <p className="text-gray-500 text-sm leading-relaxed line-clamp-2">{post.excerpt}</p>
-              <div className="flex items-center gap-2 mt-4">
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#FF9689] to-[#FFC6A4] flex items-center justify-center text-white text-xs font-semibold">
-                  {post.author.initials}
+        {loading ? (
+          <div className="flex flex-col items-center py-16">
+            <Loader2 className="w-8 h-8 text-[#FF9689] animate-spin mb-3" />
+            <p className="text-gray-400 text-sm italic">Loading latest stories...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {recent.map((post) => (
+              <Link key={post.id} to={`/blog/${post.slug}`} className="group">
+                <div className="aspect-video rounded-2xl overflow-hidden mb-5 border border-[#FFC5C1]/50">
+                  <ImageWithFallback
+                    src={post.image}
+                    alt={post.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  />
                 </div>
-                <span className="text-gray-500 text-xs">{post.author.name}</span>
-                <span className="text-gray-300 text-xs">·</span>
-                <span className="text-gray-400 text-xs">{post.date}</span>
-              </div>
-            </Link>
-          ))}
-        </div>
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="px-3 py-1 rounded-full bg-[#FFC5C1]/20 border border-[#FEAEA7]/50 text-[#FF9689] text-xs">
+                    {post.category}
+                  </span>
+                  <span className="text-gray-400 text-xs">{post.readTime}</span>
+                </div>
+                <h3 style={SERIF} className="text-gray-900 text-xl font-semibold mb-2 group-hover:text-[#FF9689] transition-colors leading-snug">
+                  {post.title}
+                </h3>
+                <p className="text-gray-500 text-sm leading-relaxed line-clamp-2">{post.excerpt}</p>
+                <div className="flex items-center gap-2 mt-4">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#FF9689] to-[#FFC6A4] flex items-center justify-center text-white text-xs font-semibold">
+                    {post.author.initials}
+                  </div>
+                  <span className="text-gray-500 text-xs">{post.author.name}</span>
+                  <span className="text-gray-300 text-xs">·</span>
+                  <span className="text-gray-400 text-xs">{post.date}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
