@@ -68,10 +68,7 @@ model Post {
   readTime  String   @default("5 min read")
   tags      String[] @default([])
   authorId  String?
-  category  String   @default("General")
   imageUrl  String?
-  readTime  String   @default("5 min read")
-  tags      String[] @default([])
   User      User?    @relation(fields: [authorId], references: [id])
 }
 
