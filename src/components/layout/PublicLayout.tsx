@@ -7,12 +7,12 @@ import { toast } from "sonner";
 import { Menu, X, Sparkles, Instagram, Facebook, Twitter, Youtube, Mail, Phone, MapPin, ChevronRight, Heart } from "lucide-react";
 
 const NAV_LINKS = [
-    { label: "Home", href: "/" },
-    { label: "Services", href: "/services" },
-    { label: "About", href: "/about" },
-    { label: "Gallery", href: "/gallery" },
-    { label: "Blog", href: "/blog" },
-    { label: "Contact", href: "/contact" },
+    { label: "Trang chủ", href: "/" },
+    { label: "Dịch vụ", href: "/services" },
+    { label: "Giới thiệu", href: "/about" },
+    { label: "Thư viện", href: "/gallery" },
+    { label: "Bài viết", href: "/blog" },
+    { label: "Liên hệ", href: "/contact" },
 ];
 
 export function Navbar() {
@@ -26,7 +26,7 @@ export function Navbar() {
 
     const handleLogout = async () => {
         await signOut({ redirect: false });
-        toast.success("Signed out successfully");
+        toast.success("Đăng xuất thành công");
         router.push("/");
     };
 
@@ -90,7 +90,7 @@ export function Navbar() {
                                 onClick={handleLogout}
                                 className="text-sm text-gray-500 hover:text-[#FF9689] transition-colors"
                             >
-                                Sign Out
+                                Đăng xuất
                             </button>
                             <a
                                 href="/admin"
@@ -102,13 +102,13 @@ export function Navbar() {
                     ) : !isLoginPage ? (
                         <>
                             <a href="/login" className="text-sm text-gray-500 hover:text-[#FF9689] transition-colors">
-                                Sign In
+                                Đăng nhập
                             </a>
                             <a
                                 href="/booking"
                                 className="px-5 py-2.5 rounded-full bg-gradient-to-r from-[#FF9689] to-[#FFC6A4] text-white text-sm font-medium hover:opacity-90 hover:shadow-lg hover:shadow-[#FF9689]/40 transition-all duration-300"
                             >
-                                Book Now
+                                Đặt hẹn
                             </a>
                         </>
                     ) : null}
@@ -139,7 +139,7 @@ export function Navbar() {
                     <div className="pt-4 flex flex-col gap-3 border-t border-[#FEAEA7]">
                         {isLoggedIn ? (
                             <>
-                                <button onClick={handleLogout} className="text-gray-500 text-sm hover:text-[#FF9689] py-2 text-left">Sign Out</button>
+                                <button onClick={handleLogout} className="text-gray-500 text-sm hover:text-[#FF9689] py-2 text-left">Đăng xuất</button>
                                 <a
                                     href="/admin"
                                     className="text-center py-3 rounded-full bg-gradient-to-r from-[#FF9689] to-[#FFC6A4] text-white text-sm font-medium"
@@ -149,12 +149,12 @@ export function Navbar() {
                             </>
                         ) : !isLoginPage ? (
                             <>
-                                <a href="/login" className="text-gray-500 text-sm hover:text-[#FF9689] py-2">Sign In</a>
+                                <a href="/login" className="text-gray-500 text-sm hover:text-[#FF9689] py-2">Đăng nhập</a>
                                 <a
                                     href="/booking"
                                     className="text-center py-3 rounded-full bg-gradient-to-r from-[#FF9689] to-[#FFC6A4] text-white text-sm font-medium"
                                 >
-                                    Book Appointment
+                                    Đặt hẹn ngay
                                 </a>
                             </>
                         ) : null}
@@ -182,7 +182,7 @@ export function Footer() {
                             <span style={{ fontFamily: "'Playfair Display', serif" }} className="text-xl font-semibold text-gray-900">AURA</span>
                         </a>
                         <p className="text-gray-500 text-sm leading-relaxed mb-6">
-                            Where luxury meets wellness. Experience the art of beauty and relaxation in a sanctuary crafted for the discerning.
+                            Nơi sự sang trọng hòa quyện cùng sức khỏe. Trải nghiệm nghệ thuật làm đẹp và thư giãn tại không gian được thiết kế dành riêng cho sự tinh tế.
                         </p>
                         <div className="flex gap-4">
                             {[Instagram, Facebook, Twitter, Youtube].map((Icon, i) => (
@@ -195,7 +195,7 @@ export function Footer() {
 
                     {/* Quick Links */}
                     <div>
-                        <h4 style={{ fontFamily: "'Playfair Display', serif" }} className="text-gray-900 font-semibold mb-6">Explore</h4>
+                        <h4 style={{ fontFamily: "'Playfair Display', serif" }} className="text-gray-900 font-semibold mb-6">Khám phá</h4>
                         <ul className="space-y-3">
                             {NAV_LINKS.map((link) => (
                                 <li key={link.href}>
@@ -210,9 +210,9 @@ export function Footer() {
 
                     {/* Services */}
                     <div>
-                        <h4 style={{ fontFamily: "'Playfair Display', serif" }} className="text-gray-900 font-semibold mb-6">Treatments</h4>
+                        <h4 style={{ fontFamily: "'Playfair Display', serif" }} className="text-gray-900 font-semibold mb-6">Liệu trình</h4>
                         <ul className="space-y-3">
-                            {["Signature Facial", "Hot Stone Massage", "Aromatherapy Ritual", "Body Wrap Therapy", "Anti-Aging Facial", "Hydrotherapy Pool"].map((s) => (
+                            {["Chăm sóc da mặt cơ bản", "Massage đá nóng", "Liệu pháp hương thơm", "Đắp mặt nạ toàn thân", "Chăm sóc da mặt chống lão hóa", "Trị liệu thủy lực"].map((s) => (
                                 <li key={s}>
                                     <a href="/services" className="text-gray-500 text-sm hover:text-[#FF9689] transition-colors flex items-center gap-2 group">
                                         <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0 text-[#FF9689]" />
@@ -225,11 +225,11 @@ export function Footer() {
 
                     {/* Contact */}
                     <div>
-                        <h4 style={{ fontFamily: "'Playfair Display', serif" }} className="text-gray-900 font-semibold mb-6">Contact</h4>
+                        <h4 style={{ fontFamily: "'Playfair Display', serif" }} className="text-gray-900 font-semibold mb-6">Liên hệ</h4>
                         <ul className="space-y-4">
                             <li className="flex items-start gap-3">
                                 <MapPin className="w-4 h-4 text-[#FF9689] mt-0.5 shrink-0" />
-                                <span className="text-gray-500 text-sm">425 Madison Avenue, Suite 1200<br />New York, NY 10017</span>
+                                <span className="text-gray-500 text-sm">Tầng 12, Tòa nhà Bitexco<br />Quận 1, TP. HCM</span>
                             </li>
                             <li className="flex items-center gap-3">
                                 <Phone className="w-4 h-4 text-[#FF9689] shrink-0" />
@@ -241,9 +241,9 @@ export function Footer() {
                             </li>
                         </ul>
                         <div className="mt-6 p-4 rounded-xl bg-white border border-[#FFC5C1]/50 shadow-sm shadow-[#FEAEA7]/10">
-                            <p className="text-[#FF9689] text-xs font-medium mb-1">Opening Hours</p>
-                            <p className="text-gray-600 text-sm">Mon – Fri: 9am – 8pm</p>
-                            <p className="text-gray-600 text-sm">Sat – Sun: 10am – 7pm</p>
+                            <p className="text-[#FF9689] text-xs font-medium mb-1">Giờ mở cửa</p>
+                            <p className="text-gray-600 text-sm">Thứ Hai – Thứ Sáu: 9:00 – 20:00</p>
+                            <p className="text-gray-600 text-sm">Thứ Bảy – Chủ Nhật: 10:00 – 19:00</p>
                         </div>
                     </div>
                 </div>
@@ -254,18 +254,18 @@ export function Footer() {
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
                         <div>
                             <h3 style={{ fontFamily: "'Playfair Display', serif" }} className="text-gray-900 text-xl font-semibold mb-1">
-                                Join the AURA Community
+                                Tham gia Cộng đồng AURA
                             </h3>
-                            <p className="text-gray-500 text-sm">Exclusive offers, wellness tips, and new treatment announcements.</p>
+                            <p className="text-gray-500 text-sm">Nhận ưu đãi độc quyền, mẹo chăm sóc sức khỏe và thông báo liệu trình mới.</p>
                         </div>
                         <div className="flex gap-3 w-full md:w-auto">
                             <input
                                 type="email"
-                                placeholder="Enter your email"
+                                placeholder="Nhập email của bạn"
                                 className="flex-1 md:w-72 px-4 py-3 rounded-full bg-white border border-[#FEAEA7] text-gray-700 text-sm placeholder-gray-400 focus:outline-none focus:border-[#FF9689] focus:ring-2 focus:ring-[#FF9689]/20 transition-all shadow-sm"
                             />
                             <button className="px-6 py-3 rounded-full bg-gradient-to-r from-[#FF9689] to-[#FFC6A4] text-white text-sm font-medium hover:opacity-90 hover:shadow-lg hover:shadow-[#FF9689]/30 transition-all whitespace-nowrap">
-                                Subscribe
+                                Đăng ký
                             </button>
                         </div>
                     </div>
@@ -274,10 +274,10 @@ export function Footer() {
                 {/* Bottom bar */}
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 border-t border-[#FFC5C1]/30">
                     <p className="text-gray-400 text-sm flex items-center gap-1.5">
-                        © 2026 AURA Luxury Spa. Made with <Heart className="w-3 h-3 text-[#FF9689] fill-[#FF9689]" /> All rights reserved.
+                        © 2026 AURA Luxury Spa. Made with <Heart className="w-3 h-3 text-[#FF9689] fill-[#FF9689]" /> Mọi quyền được bảo lưu.
                     </p>
                     <div className="flex gap-6">
-                        {["Privacy Policy", "Terms of Service", "Cookie Policy"].map((item) => (
+                        {["Chính sách bảo mật", "Điều khoản dịch vụ", "Chính sách Cookie"].map((item) => (
                             <a key={item} href="#" className="text-gray-400 text-sm hover:text-[#FF9689] transition-colors">{item}</a>
                         ))}
                     </div>

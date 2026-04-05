@@ -8,10 +8,10 @@ import { toast } from "sonner";
 const SERIF = { fontFamily: "'Playfair Display', serif" };
 
 const STAT_CARDS = [
-  { label: "Total Revenue", value: "$32,840", change: "+12.5%", up: true, icon: DollarSign, color: "from-[#EC4899] to-[#F472B6]", bg: "bg-pink-50", ring: "ring-pink-200/60" },
-  { label: "Bookings (Mar)", value: "164", change: "+8.2%", up: true, icon: CalendarDays, color: "from-[#A855F7] to-[#C084FC]", bg: "bg-purple-50", ring: "ring-purple-200/60" },
-  { label: "Active Clients", value: "847", change: "+15.3%", up: true, icon: Users, color: "from-[#F472B6] to-[#EC4899]", bg: "bg-rose-50", ring: "ring-rose-200/60" },
-  { label: "Avg. Rating", value: "4.97", change: "+0.02", up: true, icon: Star, color: "from-[#FBBF24] to-[#F59E0B]", bg: "bg-amber-50", ring: "ring-amber-200/60" },
+  { label: "Tổng doanh thu", value: "$32,840", change: "+12.5%", up: true, icon: DollarSign, color: "from-[#EC4899] to-[#F472B6]", bg: "bg-pink-50", ring: "ring-pink-200/60" },
+  { label: "Lịch hẹn", value: "164", change: "+8.2%", up: true, icon: CalendarDays, color: "from-[#A855F7] to-[#C084FC]", bg: "bg-purple-50", ring: "ring-purple-200/60" },
+  { label: "Khách kích hoạt", value: "847", change: "+15.3%", up: true, icon: Users, color: "from-[#F472B6] to-[#EC4899]", bg: "bg-rose-50", ring: "ring-rose-200/60" },
+  { label: "Đánh giá TB", value: "4.97", change: "+0.02", up: true, icon: Star, color: "from-[#FBBF24] to-[#F59E0B]", bg: "bg-amber-50", ring: "ring-amber-200/60" },
 ];
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -75,8 +75,8 @@ export function AdminDashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 style={SERIF} className="text-gray-900 text-2xl font-semibold">Dashboard Overview</h1>
-          <p className="text-gray-400 text-sm mt-1">{new Date().toLocaleDateString("en", { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
+          <h1 style={SERIF} className="text-gray-900 text-2xl font-semibold">Tổng quan</h1>
+          <p className="text-gray-400 text-sm mt-1">{new Date().toLocaleDateString("vi", { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
         </div>
       </div>
 
@@ -108,12 +108,12 @@ export function AdminDashboard() {
         <div className="xl:col-span-2 p-6 rounded-2xl bg-white border border-pink-100/80">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 style={SERIF} className="text-gray-900 font-semibold">Revenue & Bookings</h3>
-              <p className="text-gray-400 text-xs mt-0.5">Last 8 months</p>
+              <h3 style={SERIF} className="text-gray-900 font-semibold">Doanh thu & Lịch hẹn</h3>
+              <p className="text-gray-400 text-xs mt-0.5">8 tháng qua</p>
             </div>
             <select className="bg-pink-50 border border-pink-200/60 rounded-lg px-3 py-1.5 text-gray-600 text-xs focus:outline-none focus:border-pink-300">
-              <option>Last 8 Months</option>
-              <option>Last Year</option>
+              <option>8 tháng qua</option>
+              <option>Năm ngoái</option>
             </select>
           </div>
           <ResponsiveContainer width="100%" height={240}>
@@ -139,8 +139,8 @@ export function AdminDashboard() {
 
         {/* Service Distribution Pie */}
         <div className="p-6 rounded-2xl bg-white border border-pink-100/80">
-          <h3 style={SERIF} className="text-gray-900 font-semibold mb-1">Service Mix</h3>
-          <p className="text-gray-400 text-xs mb-5">Treatment distribution</p>
+          <h3 style={SERIF} className="text-gray-900 font-semibold mb-1">Cơ cấu dịch vụ</h3>
+          <p className="text-gray-400 text-xs mb-5">Phân bổ liệu trình khách chọn</p>
           <div className="flex justify-center mb-4">
             <ResponsiveContainer width={180} height={180}>
               <PieChart>
@@ -170,8 +170,8 @@ export function AdminDashboard() {
       <div className="p-6 rounded-2xl bg-white border border-pink-100/80 mb-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 style={SERIF} className="text-gray-900 font-semibold">Monthly Bookings</h3>
-            <p className="text-gray-400 text-xs mt-0.5">Appointment volume per month</p>
+            <h3 style={SERIF} className="text-gray-900 font-semibold">Lịch hẹn theo tháng</h3>
+            <p className="text-gray-400 text-xs mt-0.5">Lưu lượng khách mỗi tháng</p>
           </div>
         </div>
         <ResponsiveContainer width="100%" height={160}>
@@ -199,9 +199,9 @@ export function AdminDashboard() {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         <div className="xl:col-span-2 rounded-2xl bg-white border border-pink-100/80 overflow-hidden">
           <div className="flex items-center justify-between px-6 py-5 border-b border-pink-50">
-            <h3 style={SERIF} className="text-gray-900 font-semibold">Recent Bookings</h3>
+            <h3 style={SERIF} className="text-gray-900 font-semibold">Lịch hẹn gần đây</h3>
             <Link to="/admin/bookings" className="text-pink-500 text-sm hover:text-pink-700 transition-colors flex items-center gap-1">
-              View all <ArrowRight className="w-3.5 h-3.5" />
+              Xem tất cả <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
           <div className="overflow-x-auto">
@@ -213,11 +213,11 @@ export function AdminDashboard() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-pink-50/80">
-                    <th className="px-6 py-3 text-left text-gray-400 text-xs uppercase tracking-wider">Client</th>
-                    <th className="px-6 py-3 text-left text-gray-400 text-xs uppercase tracking-wider">Service</th>
-                    <th className="px-6 py-3 text-left text-gray-400 text-xs uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-3 text-left text-gray-400 text-xs uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-right text-gray-400 text-xs uppercase tracking-wider">Amount</th>
+                    <th className="px-6 py-3 text-left text-gray-400 text-xs uppercase tracking-wider">Khách hàng</th>
+                    <th className="px-6 py-3 text-left text-gray-400 text-xs uppercase tracking-wider">Dịch vụ</th>
+                    <th className="px-6 py-3 text-left text-gray-400 text-xs uppercase tracking-wider">Ngày/Giờ</th>
+                    <th className="px-6 py-3 text-left text-gray-400 text-xs uppercase tracking-wider">Trạng thái</th>
+                    <th className="px-6 py-3 text-right text-gray-400 text-xs uppercase tracking-wider">Thành tiền</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -239,7 +239,7 @@ export function AdminDashboard() {
                       </td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex px-2.5 py-1 rounded-full text-xs border capitalize ${statusColor[b.status]}`}>
-                          {b.status}
+                          {b.status === "pending" ? "Chờ duyệt" : b.status === "confirmed" ? "Đã xác nhận" : b.status === "completed" ? "Hoàn thành" : b.status === "cancelled" ? "Đã hủy" : b.status}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right text-gray-900 font-medium text-sm">${b.amount}</td>
@@ -247,7 +247,7 @@ export function AdminDashboard() {
                   ))}
                   {recentBookings.length === 0 && (
                     <tr>
-                      <td colSpan={5} className="px-6 py-12 text-center text-gray-400 text-sm">No recent bookings</td>
+                      <td colSpan={5} className="px-6 py-12 text-center text-gray-400 text-sm">Chưa có lịch hẹn gần đây</td>
                     </tr>
                   )}
                 </tbody>
@@ -259,13 +259,13 @@ export function AdminDashboard() {
         {/* Quick Actions */}
         <div className="space-y-4">
           <div className="p-6 rounded-2xl bg-white border border-pink-100/80">
-            <h3 style={SERIF} className="text-gray-900 font-semibold mb-5">Quick Actions</h3>
+            <h3 style={SERIF} className="text-gray-900 font-semibold mb-5">Tác vụ nhanh</h3>
             <div className="space-y-2">
               {[
-                { label: "Manage Services", href: "/admin/services", gradient: false },
-                { label: "View Customers", href: "/admin/customers", gradient: false },
-                { label: "Media Library", href: "/admin/media", gradient: false },
-                { label: "Settings", href: "/admin/settings", gradient: false },
+                { label: "Quản lý dịch vụ", href: "/admin/services", gradient: false },
+                { label: "Xem khách hàng", href: "/admin/customers", gradient: false },
+                { label: "Thư viện Ảnh", href: "/admin/media", gradient: false },
+                { label: "Cài đặt & Điểm", href: "/admin/settings", gradient: false },
               ].map((action) => (
                 <Link
                   key={action.label}
@@ -285,12 +285,12 @@ export function AdminDashboard() {
 
           {/* Today's summary */}
           <div className="p-6 rounded-2xl bg-gradient-to-br from-pink-50 to-fuchsia-50/60 border border-pink-200/50">
-            <h3 style={SERIF} className="text-gray-900 font-semibold mb-4">Today's Summary</h3>
+            <h3 style={SERIF} className="text-gray-900 font-semibold mb-4">Tổng kết Hôm nay</h3>
             <div className="space-y-3">
               {[
-                { label: "Appointments", value: "8" },
-                { label: "Expected Revenue", value: "$1,240" },
-                { label: "Available Slots", value: "4" },
+                { label: "Số lịch hẹn", value: "8" },
+                { label: "Doanh thu dự kiến", value: "$1,240" },
+                { label: "Lịch trống còn lại", value: "4" },
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between">
                   <span className="text-gray-500 text-sm">{item.label}</span>

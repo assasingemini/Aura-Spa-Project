@@ -68,12 +68,12 @@ function HeroSection() {
     },
     {
       image: "https://images.unsplash.com/photo-1752477225721-5f1b72f83b4a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZWF1dGlmdWwlMjBhc2lhbiUyMG1vZGVsJTIwd2VsbG5lc3MlMjBwb3J0cmFpdHxlbnwxfHx8fDE3NzM1ODQzODd8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      title: "Brand Ambassador",
+      title: "Đại sứ thương hiệu",
       subtitle: "Đại sứ thương hiệu AURA"
     },
     {
       image: "https://images.unsplash.com/photo-1761718210055-e83ca7e2c9ad?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcGElMjB0cmVhdG1lbnQlMjBwcm9mZXNzaW9uYWwlMjBoYW5kcyUyMGZhY2lhbHxlbnwxfHx8fDE3NzM1ODQzODh8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      title: "Professional Care",
+      title: "Chăm sóc chuyên nghiệp",
       subtitle: "Chăm sóc chuyên nghiệp"
     }
   ];
@@ -131,7 +131,7 @@ function HeroSection() {
       {/* Scroll indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-40 z-20">
         <div className="w-px h-12 bg-gradient-to-b from-transparent to-[#FF9689]" />
-        <p className="text-[#FF9689] text-xs tracking-widest uppercase">Scroll</p>
+        <p className="text-[#FF9689] text-xs tracking-widest uppercase">Kéo xuống</p>
       </div>
     </section>
   );
@@ -173,12 +173,12 @@ function FeaturedTreatments() {
     <section className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
-          <SectionBadge label="Our Signature Treatments" />
+          <SectionBadge label="Liệu trình nổi bật" />
           <h2 style={SERIF} className="text-4xl lg:text-5xl font-semibold text-gray-900 mb-4">
-            Curated for <GradientText>Exceptional</GradientText> Results
+            Được thiết kế cho <GradientText>Kết quả đặc biệt</GradientText>
           </h2>
           <p className="text-gray-500 max-w-xl mx-auto leading-relaxed">
-            Each treatment is a masterpiece, blending ancient wisdom with cutting-edge techniques for a truly transformative experience.
+            Mỗi liệu trình là một kiệt tác, kết hợp sự thông thái cổ xưa với các kỹ thuật tiên tiến để mang lại trải nghiệm thay đổi thực sự.
           </p>
         </div>
 
@@ -186,7 +186,7 @@ function FeaturedTreatments() {
           {loading ? (
             <div className="flex flex-col items-center py-20">
               <Loader2 className="w-8 h-8 text-[#FF9689] animate-spin mb-3" />
-              <p className="text-gray-400 text-sm italic">Curating your experience...</p>
+              <p className="text-gray-400 text-sm italic">Đang tải trải nghiệm của bạn...</p>
             </div>
           ) : (
             featured.map((service, i) => (
@@ -213,7 +213,7 @@ function FeaturedTreatments() {
                     to="/booking"
                     className="inline-flex items-center gap-2 text-[#FF9689] text-base group-hover:gap-3 transition-all font-medium self-start bg-[#FFC5C1]/20 px-6 py-3 rounded-full hover:bg-[#FF9689] hover:text-white"
                   >
-                    Book Appointment <ArrowRight className="w-4 h-4" />
+                    Đặt hẹn ngay <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
               </div>
@@ -226,7 +226,7 @@ function FeaturedTreatments() {
             to="/services"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-full border border-[#FEAEA7] text-gray-600 hover:text-[#FF9689] hover:border-[#FF9689] hover:bg-[#FFC5C1]/20 transition-all duration-300 group"
           >
-            View All Treatments
+            Xem tất cả liệu trình
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
@@ -240,27 +240,27 @@ function SpaGallerySection() {
   const spaImages = [
     {
       image: "https://images.unsplash.com/photo-1700142360825-d21edc53c8db?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcGElMjBtYXNzYWdlJTIwdGhlcmFweSUyMHJvb218ZW58MXx8fHwxNzczNDk5Njk3fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      title: "Tranquil Treatment Rooms"
+      title: "Phòng trị liệu yên tĩnh"
     },
     {
       image: "https://images.unsplash.com/photo-1640791416299-25645e72d186?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxlc3NlbnRpYWwlMjBvaWxzJTIwYm90dGxlcyUyMHNwYSUyMG1hc3NhZ2V8ZW58MXx8fHwxNzczNTg1MzU2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      title: "Aromatherapy Blends"
+      title: "Hương thơm dịu nhẹ"
     },
     {
       image: "https://images.unsplash.com/photo-1680163660834-fa4f67748e21?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcGElMjBob3QlMjBzdG9uZXMlMjBtYXNzYWdlJTIwdGhlcmFweXxlbnwxfHx8fDE3NzM1ODUzNTd8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      title: "Hot Stone Therapy"
+      title: "Trị liệu đá nóng"
     },
     {
       image: "https://images.unsplash.com/photo-1761718210089-ba3bb5ccb54f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYWNpYWwlMjB0cmVhdG1lbnQlMjBtYXNrJTIwc2Fsb258ZW58MXx8fHwxNzczNTg1MzU3fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      title: "Rejuvenating Facials"
+      title: "Làm trẻ hóa da mặt"
     },
     {
       image: "https://images.unsplash.com/photo-1669281392832-9181a2b484af?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcGElMjBib2R5JTIwc2NydWIlMjBvcmdhbmljJTIwbmF0dXJhbHxlbnwxfHx8fDE3NzM1ODUzNTd8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      title: "Organic Body Scrubs"
+      title: "Tẩy tế bào chết hữu cơ"
     },
     {
       image: "https://images.unsplash.com/photo-1595788088802-0e32ff9306f6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBzcGElMjBqYWN1enppJTIwZmxvd2VyJTIwcGV0YWxzfGVufDF8fHx8MTc3MzU4NTM1N3ww&ixlib=rb-4.1.0&q=80&w=1080",
-      title: "Floral Hydrotherapy"
+      title: "Trị liệu thủy lực hoa cỏ"
     }
   ];
 
@@ -268,12 +268,12 @@ function SpaGallerySection() {
     <section className="py-24 bg-gradient-to-br from-[#FFD6BE]/30 via-[#FFC5C1]/20 to-[#FEAEA7]/20">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
-          <SectionBadge label="Our Luxurious Space" />
+          <SectionBadge label="Không gian sang trọng" />
           <h2 style={SERIF} className="text-4xl lg:text-5xl font-semibold text-gray-900 mb-4">
-            Professional Spa, <GradientText>Elegant Sanctuary</GradientText>
+            Spa chuyên nghiệp, <GradientText>Thánh địa thanh lịch</GradientText>
           </h2>
           <p className="text-gray-500 max-w-xl mx-auto">
-            Step into a world of luxury and tranquility. Our state-of-the-art facilities are designed to provide the ultimate wellness experience.
+            Bước vào thế giới của sự xa hoa và yên bình. Cơ sở vật chất tối tân của chúng tôi được thiết kế để mang đến trải nghiệm chăm sóc sức khỏe tối ưu nhất.
           </p>
         </div>
 
@@ -305,21 +305,21 @@ function SpaGallerySection() {
 // ── Service Categories ────────────────────────────────────────────────────────
 function ServiceCategories() {
   const categories = [
-    { icon: Sparkles, title: "Facial Treatments", desc: "Advanced skincare for radiant results", count: "12 treatments", color: "from-[#FFC5C1]/40 to-[#FFD6BE]/30" },
-    { icon: Wind, title: "Massage Therapy", desc: "Deep relaxation for body and mind", count: "8 treatments", color: "from-[#FEAEA7]/40 to-[#FFC6A4]/30" },
-    { icon: Droplets, title: "Holistic Wellness", desc: "Mind-body harmony through ancient rituals", count: "6 treatments", color: "from-[#FFD6BE]/40 to-[#FFC5C1]/30" },
-    { icon: Zap, title: "Body Treatments", desc: "Full-body transformation rituals", count: "5 treatments", color: "from-[#FFC6A4]/40 to-[#FEAEA7]/30" },
-    { icon: Heart, title: "Water Therapy", desc: "Healing hydrotherapy experiences", count: "4 treatments", color: "from-[#FFC5C1]/40 to-[#FFC6A4]/30" },
-    { icon: Award, title: "Hand & Nail", desc: "Precision artistry for hands and nails", count: "6 treatments", color: "from-[#FEAEA7]/40 to-[#FFD6BE]/30" },
+    { icon: Sparkles, title: "Chăm sóc da mặt", desc: "Chăm sóc da chuyên sâu cho kết quả rạng rỡ", count: "12 liệu trình", color: "from-[#FFC5C1]/40 to-[#FFD6BE]/30" },
+    { icon: Wind, title: "Trị liệu Massage", desc: "Thư giãn sâu cho cơ thể và tâm trí", count: "8 liệu trình", color: "from-[#FEAEA7]/40 to-[#FFC6A4]/30" },
+    { icon: Droplets, title: "Sức khỏe toàn diện", desc: "Hòa hợp tâm trí và cơ thể với nghi thức cổ xưa", count: "6 liệu trình", color: "from-[#FFD6BE]/40 to-[#FFC5C1]/30" },
+    { icon: Zap, title: "Chăm sóc cơ thể", desc: "Liệu trình thay đổi diện mạo toàn thân", count: "5 liệu trình", color: "from-[#FFC6A4]/40 to-[#FEAEA7]/30" },
+    { icon: Heart, title: "Trị liệu dưới nước", desc: "Trải nghiệm trị liệu bằng nước chữa lành", count: "4 liệu trình", color: "from-[#FFC5C1]/40 to-[#FFC6A4]/30" },
+    { icon: Award, title: "Chăm sóc tay & móng", desc: "Nghệ thuật làm đẹp tỉ mỉ cho tay và móng", count: "6 liệu trình", color: "from-[#FEAEA7]/40 to-[#FFD6BE]/30" },
   ];
 
   return (
     <section className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
-          <SectionBadge label="Treatment Categories" />
+          <SectionBadge label="Danh mục liệu trình" />
           <h2 style={SERIF} className="text-4xl lg:text-5xl font-semibold text-gray-900 mb-4">
-            Every <GradientText>Need</GradientText>, Perfectly Met
+            Mọi <GradientText>Nhu cầu</GradientText>, Đều được đáp ứng
           </h2>
         </div>
 
@@ -358,12 +358,12 @@ function BeforeAfterSection() {
     <section className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
-          <SectionBadge label="Visible Transformations" />
+          <SectionBadge label="Sự thay đổi rõ rệt" />
           <h2 style={SERIF} className="text-4xl lg:text-5xl font-semibold text-gray-900 mb-4">
-            Real Results, <GradientText>Real Beauty</GradientText>
+            Kết quả thực, <GradientText>Vẻ đẹp thực</GradientText>
           </h2>
           <p className="text-gray-500 max-w-xl mx-auto">
-            The AURA difference is visible from your very first session. See the transformation our clients experience.
+            Sự khác biệt của AURA được thể hiện rõ rệt ngay từ phiên đầu tiên. Chứng kiến sự thay đổi mà khách hàng của chúng tôi trải nghiệm.
           </p>
         </div>
 
@@ -374,13 +374,13 @@ function BeforeAfterSection() {
                 <div className="relative aspect-[4/5]">
                   <ImageWithFallback src={pair.before} alt="Before" className="w-full h-full object-cover opacity-75" />
                   <div className="absolute bottom-4 left-4">
-                    <span className="px-3 py-1 rounded-full bg-white/90 text-gray-600 text-xs backdrop-blur-sm border border-pink-100">Before</span>
+                    <span className="px-3 py-1 rounded-full bg-white/90 text-gray-600 text-xs backdrop-blur-sm border border-pink-100">Trước</span>
                   </div>
                 </div>
                 <div className="relative aspect-[4/5]">
                   <ImageWithFallback src={pair.after} alt="After" className="w-full h-full object-cover" />
                   <div className="absolute bottom-4 right-4">
-                    <span className="px-3 py-1 rounded-full bg-gradient-to-r from-[#EC4899] to-[#A855F7] text-white text-xs">After</span>
+                    <span className="px-3 py-1 rounded-full bg-gradient-to-r from-[#EC4899] to-[#A855F7] text-white text-xs">Sau</span>
                   </div>
                 </div>
               </div>
@@ -401,9 +401,9 @@ function TestimonialsSection() {
     <section className="py-24 bg-gradient-to-br from-[#FFD6BE]/30 via-[#FFC5C1]/20 to-[#FEAEA7]/20">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
-          <SectionBadge label="Client Stories" />
+          <SectionBadge label="Câu chuyện Khách hàng" />
           <h2 style={SERIF} className="text-4xl lg:text-5xl font-semibold text-gray-900 mb-4">
-            Trusted by <GradientText>Thousands</GradientText>
+            Được tin tưởng bởi <GradientText>Hàng ngàn</GradientText> khách hàng
           </h2>
         </div>
 
@@ -468,12 +468,12 @@ function SpecialistsSection() {
     <section className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
-          <SectionBadge label="Our Expert Team" />
+          <SectionBadge label="Đội ngũ Chuyên gia" />
           <h2 style={SERIF} className="text-4xl lg:text-5xl font-semibold text-gray-900 mb-4">
-            Masters of Their <GradientText>Craft</GradientText>
+            Bậc thầy trong <GradientText>Nghề</GradientText>
           </h2>
           <p className="text-gray-500 max-w-xl mx-auto">
-            Our specialists are among the most highly trained and passionate professionals in luxury wellness.
+            Đội ngũ chuyên gia của chúng tôi là những chuyên gia được đào tạo bài bản và tận tâm nhất trong lĩnh vực chăm sóc sức khỏe cao cấp.
           </p>
         </div>
 
@@ -490,7 +490,7 @@ function SpecialistsSection() {
               </div>
               <h3 style={SERIF} className="text-gray-900 text-xl font-semibold mb-1">{spec.name}</h3>
               <p className="text-[#FF9689] text-sm mb-3">{spec.role}</p>
-              <p className="text-gray-400 text-xs mb-4">{spec.experience} experience</p>
+              <p className="text-gray-400 text-xs mb-4">{spec.experience} kinh nghiệm</p>
               <div className="flex flex-wrap justify-center gap-2">
                 {spec.specialties.map((s) => (
                   <span key={s} className="px-2.5 py-1 rounded-full bg-[#FFC5C1]/20 border border-[#FEAEA7]/50 text-[#FF9689] text-xs">
@@ -512,12 +512,12 @@ function PricingSection() {
     <section className="py-24 bg-gradient-to-br from-[#FFD6BE]/30 via-[#FFC5C1]/20 to-[#FEAEA7]/20">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
-          <SectionBadge label="Membership Plans" />
+          <SectionBadge label="Gói Thành viên" />
           <h2 style={SERIF} className="text-4xl lg:text-5xl font-semibold text-gray-900 mb-4">
-            Invest in Your <GradientText>Wellbeing</GradientText>
+            Đầu tư cho <GradientText>Sức khỏe</GradientText>
           </h2>
           <p className="text-gray-500 max-w-xl mx-auto">
-            Choose a membership that fits your lifestyle. All plans include exclusive member benefits and priority access.
+            Chọn gói thành viên phù hợp với lối sống của bạn. Tất cả các gói đều bao gồm các đặc quyền ưu tiên và dịch vụ độc quyền.
           </p>
         </div>
 
@@ -534,7 +534,7 @@ function PricingSection() {
               {pkg.featured && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                   <span className="px-4 py-1.5 rounded-full bg-gradient-to-r from-[#FF9689] to-[#FFC6A4] text-white text-xs font-medium shadow-sm shadow-[#FF9689]/40">
-                    Most Popular
+                    Phổ biến nhất
                   </span>
                 </div>
               )}
@@ -603,20 +603,20 @@ function BlogPreview() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
           <div>
-            <SectionBadge label="Wellness Journal" />
+            <SectionBadge label="Nhật ký Sức khỏe" />
             <h2 style={SERIF} className="text-4xl lg:text-5xl font-semibold text-gray-900">
-              Insights & <GradientText>Inspiration</GradientText>
+              Kiến thức & <GradientText>Cảm hứng</GradientText>
             </h2>
           </div>
           <Link to="/blog" className="flex items-center gap-2 text-[#FF9689] hover:text-[#FFC6A4] transition-colors group">
-            View All Articles <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            Xem tất cả bài viết <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
         {loading ? (
           <div className="flex flex-col items-center py-16">
             <Loader2 className="w-8 h-8 text-[#FF9689] animate-spin mb-3" />
-            <p className="text-gray-400 text-sm italic">Loading latest stories...</p>
+            <p className="text-gray-400 text-sm italic">Đang tải các bài viết mới nhất...</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -669,26 +669,26 @@ function CTABanner() {
           <div className="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-tl from-[#FFD6BE]/60 to-transparent rounded-tl-full" />
 
           <div className="relative z-10">
-            <SectionBadge label="Your Journey Begins" />
+            <SectionBadge label="Hành trình của bạn bắt đầu" />
             <h2 style={SERIF} className="text-4xl lg:text-5xl font-semibold text-gray-900 mb-4">
-              Ready for Your <GradientText>Transformation</GradientText>?
+              Sẵn sàng cho sự <GradientText>Thay đổi</GradientText>?
             </h2>
             <p className="text-gray-500 max-w-lg mx-auto mb-10 leading-relaxed">
-              Book your appointment today and discover why AURA is the preferred destination for those who demand the finest in beauty and wellness.
+              Đặt lịch hẹn ngay hôm nay và khám phá lý do tại sao AURA là điểm đến ưa thích của những người đam mê làm đẹp và chăm sóc sức khỏe.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 to="/booking"
                 className="flex items-center gap-2 px-10 py-4 rounded-full bg-gradient-to-r from-[#FF9689] to-[#FFC6A4] text-white font-medium hover:opacity-90 hover:shadow-2xl hover:shadow-[#FF9689]/40 transition-all duration-300 group"
               >
-                Book Appointment
+                Đặt lịch hẹn
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 to="/contact"
                 className="flex items-center gap-2 px-10 py-4 rounded-full border border-[#FEAEA7] text-gray-700 hover:bg-[#FFC5C1]/20 hover:border-[#FF9689] transition-all duration-300"
               >
-                Contact Us
+                Liên hệ chúng tôi
               </Link>
             </div>
           </div>

@@ -1,0 +1,36 @@
+commit 0ae147e36561bf0f91046cc6fb07d71b560fc5a0
+Author: Besna <152285973+assasingemini@users.noreply.github.com>
+Date:   Mon Mar 23 21:56:41 2026 +0700
+
+    Add About and Services pages
+
+commit ea688587aacf8cffc6727cdf4e60414826e558bf
+Merge: 97f7844 6717640
+Author: Besna <152285973+assasingemini@users.noreply.github.com>
+Date:   Mon Mar 23 20:06:49 2026 +0700
+
+    Merge pull request #3 from assasingemini/blogPage/lac
+    
+    Blog page/lac
+
+commit 6717640c050934e2464c3a9dda3b57e70b87e9fa
+Merge: 0519a80 97f7844
+Author: Besna <152285973+assasingemini@users.noreply.github.com>
+Date:   Mon Mar 23 19:41:55 2026 +0700
+
+    Merge main into blogPage/lac and resolve conflicts
+
+commit 97f78440e76485e8f9f5efc46f774ebedb50dcd2
+Merge: 36c1321 b33507c
+Author: Besna <152285973+assasingemini@users.noreply.github.com>
+Date:   Sat Mar 21 19:34:08 2026 +0700
+
+    Merge pull request #5 from assasingemini/admin/quynh
+    
+    Admin/quynh
+
+commit b33507c4885c125dfae8102ce0de8c9572291aad
+Author: Ellies09 <quynhle.040606@gmail.com>
+Date:   Sat Mar 21 17:09:21 2026 +0700
+
+    galleryPage

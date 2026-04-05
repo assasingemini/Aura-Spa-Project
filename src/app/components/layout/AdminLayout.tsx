@@ -8,13 +8,13 @@ import {
 } from "lucide-react";
 
 const SIDEBAR_ITEMS = [
-  { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { label: "Bookings", href: "/admin/bookings", icon: CalendarDays },
-  { label: "Services", href: "/admin/services", icon: Scissors },
-  { label: "Blog Posts", href: "/admin/blog", icon: BookOpen },
-  { label: "Customers", href: "/admin/customers", icon: Users },
-  { label: "Media Library", href: "/admin/media", icon: Image },
-  { label: "Settings", href: "/admin/settings", icon: Settings },
+  { label: "Bảng điều khiển", href: "/admin", icon: LayoutDashboard },
+  { label: "Lịch đặt", href: "/admin/bookings", icon: CalendarDays },
+  { label: "Dịch vụ", href: "/admin/services", icon: Scissors },
+  { label: "Bài viết", href: "/admin/blog", icon: BookOpen },
+  { label: "Khách hàng", href: "/admin/customers", icon: Users },
+  { label: "Thư viện Ảnh", href: "/admin/media", icon: Image },
+  { label: "Cài đặt", href: "/admin/settings", icon: Settings },
 ];
 
 export function AdminLayout() {
@@ -30,7 +30,7 @@ export function AdminLayout() {
 
   const handleSignOut = () => {
     localStorage.removeItem("user");
-    toast.success("Signed out successfully");
+    toast.success("Đăng xuất thành công");
     navigate("/");
   };
 
@@ -45,7 +45,7 @@ export function AdminLayout() {
           {sidebarOpen && (
             <div>
               <span style={{ fontFamily: "'Playfair Display', serif" }} className="text-gray-900 text-lg font-semibold block leading-none">AURA</span>
-              <span className="text-pink-400 text-xs">Admin Panel</span>
+              <span className="text-pink-400 text-xs">Phân hệ Quản trị</span>
             </div>
           )}
         </Link>
@@ -53,7 +53,7 @@ export function AdminLayout() {
 
       {/* Nav */}
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-        <p className={`text-pink-300 text-xs uppercase tracking-wider mb-3 px-3 ${!sidebarOpen && "hidden"}`}>Menu</p>
+        <p className={`text-pink-300 text-xs uppercase tracking-wider mb-3 px-3 ${!sidebarOpen && "hidden"}`}>Trình đơn</p>
         {SIDEBAR_ITEMS.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.href);
@@ -84,14 +84,14 @@ export function AdminLayout() {
           className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-500 hover:text-pink-600 hover:bg-pink-50/60 transition-all group"
         >
           <TrendingUp className="w-5 h-5 shrink-0" />
-          {sidebarOpen && <span className="text-sm">View Website</span>}
+          {sidebarOpen && <span className="text-sm">Xem Trang web</span>}
         </Link>
         <button
           onClick={handleSignOut}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all text-left"
         >
           <LogOut className="w-5 h-5 shrink-0" />
-          {sidebarOpen && <span className="text-sm font-medium">Sign Out</span>}
+          {sidebarOpen && <span className="text-sm font-medium">Đăng xuất</span>}
         </button>
       </div>
     </div>
@@ -161,7 +161,7 @@ export function AdminLayout() {
               </div>
               <div className="hidden sm:block">
                 <p className="text-gray-900 text-sm font-medium leading-none">Admin</p>
-                <p className="text-pink-400 text-xs mt-0.5">Super Admin</p>
+                <p className="text-pink-400 text-xs mt-0.5">Quản trị viên</p>
               </div>
             </div>
           </div>
