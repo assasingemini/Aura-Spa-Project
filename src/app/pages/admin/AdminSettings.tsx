@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Save, Building2, Clock, Phone, Bell, Shield } from "lucide-react";
 import { toast } from "sonner";
 
@@ -8,6 +8,7 @@ const TABS = [
   { id: "general", label: "General", icon: Building2 },
   { id: "hours", label: "Business Hours", icon: Clock },
   { id: "contact", label: "Contact Info", icon: Phone },
+  { id: "booking", label: "Booking Settings", icon: Clock },
   { id: "notifications", label: "Notifications", icon: Bell },
   { id: "security", label: "Security", icon: Shield },
 ];
@@ -17,6 +18,13 @@ const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
 export function AdminSettings() {
   const [activeTab, setActiveTab] = useState("general");
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Settings state
+  const [bookingSettings, setBookingSettings] = useState({
+    dailyBookingLimit: "10",
+    limitReachedMessage: "Daily booking limit reached. Please choose another date.",
+  });
 
   const [general, setGeneral] = useState({
     name: "AURA Luxury Spa",
@@ -60,11 +68,44 @@ export function AdminSettings() {
     smsEnabled: true,
   });
 
+  // Fetch settings on mount
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch("/api/admin/settings");
+        const data = await res.json();
+        if (data && !data.error) {
+          setBookingSettings({
+            dailyBookingLimit: data.dailyBookingLimit || "10",
+            limitReachedMessage: data.limitReachedMessage || "Daily booking limit reached. Please choose another date.",
+          });
+        }
+      } catch (error) {
+        console.error("Fetch error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSettings();
+  }, []);
+
   const handleSave = async () => {
     setSaving(true);
-    await new Promise((r) => setTimeout(r, 800));
-    setSaving(false);
-    toast.success("Settings saved successfully");
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(bookingSettings),
+      });
+
+      if (!res.ok) throw new Error("Failed to save");
+      
+      toast.success("Settings saved successfully");
+    } catch (error) {
+      toast.error("Failed to save settings");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const inputClass = "w-full bg-pink-50/40 border border-pink-200/60 rounded-xl px-4 py-3 text-gray-800 text-sm focus:outline-none focus:border-pink-400 focus:bg-white transition-colors";
@@ -219,6 +260,37 @@ export function AdminSettings() {
                       />
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Booking Settings */}
+            {activeTab === "booking" && (
+              <div className="space-y-6">
+                <h2 style={SERIF} className="text-gray-900 text-xl font-semibold">Booking Configuration</h2>
+                <div className="space-y-5">
+                  <div>
+                    <label className="text-gray-500 text-sm mb-1.5 block">Daily Booking Limit</label>
+                    <p className="text-gray-400 text-xs mb-2">Maximum number of bookings allowed per day across all services.</p>
+                    <input 
+                      type="number" 
+                      value={bookingSettings.dailyBookingLimit} 
+                      onChange={(e) => setBookingSettings({ ...bookingSettings, dailyBookingLimit: e.target.value })} 
+                      className={inputClass} 
+                      placeholder="e.g. 10"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-gray-500 text-sm mb-1.5 block">Limit Reached Message</label>
+                    <p className="text-gray-400 text-xs mb-2">This message will be shown to customers when the daily limit is reached.</p>
+                    <textarea 
+                      value={bookingSettings.limitReachedMessage} 
+                      onChange={(e) => setBookingSettings({ ...bookingSettings, limitReachedMessage: e.target.value })} 
+                      rows={3} 
+                      className={`${inputClass} resize-none`} 
+                      placeholder="Enter the message to show customers..."
+                    />
+                  </div>
                 </div>
               </div>
             )}

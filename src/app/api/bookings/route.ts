@@ -74,6 +74,43 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid date or time format" }, { status: 400 });
     }
 
+    // 1. Get daily limit and custom message from settings
+    const settings = await prisma.setting.findMany({
+      where: {
+        key: { in: ["dailyBookingLimit", "limitReachedMessage"] }
+      }
+    });
+    
+    const settingsMap = settings.reduce((acc, curr) => {
+      acc[curr.key] = curr.value;
+      return acc;
+    }, {} as Record<string, string>);
+
+    const dailyLimit = parseInt(settingsMap.dailyBookingLimit || "10");
+    const limitMessage = settingsMap.limitReachedMessage || "Daily booking limit reached. Please choose another date.";
+
+    // 2. Count existing bookings for this day
+    const startOfDay = new Date(appointmentDate);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(appointmentDate);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const bookingCount = await prisma.booking.count({
+      where: {
+        appointmentDate: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+        status: { not: "CANCELLED" }
+      }
+    });
+
+    if (bookingCount >= dailyLimit) {
+      return NextResponse.json({ 
+        error: limitMessage 
+      }, { status: 400 });
+    }
+
     const booking = await prisma.booking.create({
       data: {
         ...rest,
